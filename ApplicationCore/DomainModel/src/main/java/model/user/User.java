@@ -1,9 +1,9 @@
 package model.user;
 
-import java.io.Serializable;
-
 import lombok.*;
 import model.Role;
+
+import java.io.Serializable;
 
 @Getter
 @Data

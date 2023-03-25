@@ -1,10 +1,10 @@
 package adapter.model;
 
+import adapter.model.room.RoomEnt;
+import adapter.model.user.UserEnt;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import adapter.model.room.RoomEnt;
-import adapter.model.user.UserEnt;
 import org.apache.commons.math3.util.Precision;
 
 import java.io.Serializable;

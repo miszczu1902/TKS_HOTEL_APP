@@ -1,8 +1,8 @@
 package model.room;
 
-import java.io.Serializable;
-
 import lombok.*;
+
+import java.io.Serializable;
 
 @Data
 @ToString

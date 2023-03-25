@@ -1,23 +1,21 @@
 package services;
 
-import adapter.aggregates.UserRepositoryAdapter;
-import auth.JwsGenerator;
-import com.nimbusds.jose.JOSEException;
-import model.dto.CreateUserDto;
-
-
-import model.dto.UpdateUserDto;
+//import auth.JwsGenerator;
+//import com.nimbusds.jose.JOSEException;
+import data.control.UserControlPort;
+import data.infrastructure.UserInfPort;
 import exceptions.ChangePasswordException;
 import exceptions.JwsException;
 import exceptions.UserException;
-import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import model.Role;
+import model.dto.CreateUserDto;
+import model.dto.UpdateUserDto;
 import model.user.User;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.security.enterprise.SecurityContext;
-import java.text.ParseException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
@@ -26,57 +24,62 @@ import java.util.logging.Logger;
 public class UserService {
 
     @Inject
-    private UserRepositoryAdapter userRepository;
+    private UserControlPort userControlPort;
+
+    @Inject
+    private UserInfPort userInfPort;
 
     @Inject
     private SecurityContext securityContext;
 
-    private final JwsGenerator jwsGenerator = new JwsGenerator();
+//    private final JwsGenerator jwsGenerator = new JwsGenerator();
 
     private final Logger log = Logger.getLogger(getClass().getName());
 
     public List<User> getAllUsers() {
-        return userRepository.getAll();
+        return userInfPort.getAll();
     }
 
     public List<User> getAllClients() {
-        return userRepository.getAllClients();
+        return userInfPort.getAllClients();
     }
 
     public List<User> getClientsByUsername(String pattern) {
-        return userRepository.getByUsername(pattern);
+        return userInfPort.getByUsername(pattern);
     }
 
     public User getClientByUsername(String username) {
-        return userRepository.get(username);
+        return userInfPort.get(username);
     }
 
+    @Transactional(dontRollbackOn = NoSuchElementException.class)
     public void addClientToHotel(CreateUserDto client) throws UserException {
         try {
-            userRepository.getRepository().getEntityTransaction().begin();
-            userRepository.get(client.getUsername());
-            userRepository.getRepository().getEntityManager().lock(userRepository.get(client.getUsername()), LockModeType.PESSIMISTIC_WRITE);
-            userRepository.getRepository().getEntityTransaction().rollback();
+//            userControlPort.getRepository().getEntityTransaction().begin();
+            userInfPort.get(client.getUsername());
+//            userControlPort.getRepository().getEntityManager().lock(userControlPort.get(client.getUsername()), LockModeType.PESSIMISTIC_WRITE);
+//            userControlPort.getRepository().getEntityTransaction().rollback();
             log.warning("Client %s already exists".formatted(client.getUsername()));
             throw new UserException("Client %s already exists".formatted(client.getUsername()));
         } catch (NoSuchElementException e) {
-            userRepository.add(new User(client.getUsername(), client.getPassword(), client.getFirstName(),
+            userControlPort.add(new User(client.getUsername(), client.getPassword(), client.getFirstName(),
                     client.getLastName(), client.getCity(), client.getStreet(), client.getStreetNumber(), client.getPostalCode()));
-            userRepository.getRepository().getEntityTransaction().commit();
+//            userControlPort.getRepository().getEntityTransaction().commit();
         }
     }
 
+    @Transactional(dontRollbackOn = NoSuchElementException.class)
     public void modifyClient(UpdateUserDto client, String jws) throws JwsException, UserException {
         try {
-            if (jwsGenerator.verify(jws)) {
-                String newJws = jwsGenerator.generateJws(client.getUsername());
-                if (!newJws.equals(jws)) {
-                    throw new JwsException("Username can not be changed");
-                }
-            }
-            userRepository.getRepository().getEntityTransaction().begin();
-            User oldUser = userRepository.get(client.getUsername());
-            userRepository.getRepository().getEntityManager().lock(oldUser, LockModeType.PESSIMISTIC_WRITE);
+//            if (jwsGenerator.verify(jws)) {
+//                String newJws = jwsGenerator.generateJws(client.getUsername());
+//                if (!newJws.equals(jws)) {
+//                    throw new JwsException("Username can not be changed");
+//                }
+//            }
+//            userControlPort.getRepository().getEntityTransaction().begin();
+            User oldUser = userInfPort.get(client.getUsername());
+//            userControlPort.getRepository().getEntityManager().lock(oldUser, LockModeType.PESSIMISTIC_WRITE);
 
             oldUser.setUsername(client.getUsername());
             oldUser.setFirstName(client.getFirstName());
@@ -86,73 +89,77 @@ public class UserService {
             oldUser.setStreetNumber(client.getStreetNumber());
             oldUser.setPostalCode(client.getPostalCode());
             oldUser.setRole(Role.valueOf(client.getRole()));
-            userRepository.update(oldUser);
-            userRepository.getRepository().getEntityTransaction().commit();
+            userControlPort.update(oldUser);
+//            userControlPort.getRepository().getEntityTransaction().commit();
         } catch (NoSuchElementException e) {
-            userRepository.getRepository().getEntityTransaction().rollback();
+//            userControlPort.getRepository().getEntityTransaction().rollback();
             log.warning("Client %s does not exist".formatted(client.getUsername()));
             throw new UserException("Client %s does not exist".formatted(client.getUsername()));
-        } catch (ParseException | JOSEException e) {
-            throw new JwsException("JWS exception");
         }
+//        catch (ParseException | JOSEException e) {
+//            throw new JwsException("JWS exception");
+//        }
     }
 
+    @Transactional(dontRollbackOn = NoSuchElementException.class)
     public void deactivateClient(String username) throws UserException {
         try {
-            userRepository.getRepository().getEntityTransaction().begin();
-            User user = userRepository.get(username);
-            userRepository.getRepository().getEntityManager().lock(user, LockModeType.PESSIMISTIC_WRITE);
+//            userControlPort.getRepository().getEntityTransaction().begin();
+            User user = userInfPort.get(username);
+//            userControlPort.getRepository().getEntityManager().lock(user, LockModeType.PESSIMISTIC_WRITE);
             user.setIsActive(false);
-            userRepository.update(user);
-            userRepository.getRepository().getEntityTransaction().commit();
+            userControlPort.update(user);
+//            userControlPort.getRepository().getEntityTransaction().commit();
         } catch (NoSuchElementException e) {
-            userRepository.getRepository().getEntityTransaction().rollback();
+//            userControlPort.getRepository().getEntityTransaction().rollback();
             log.warning("Client %s does not exist".formatted(username));
             throw new UserException("Client %s does not exist".formatted(username));
         }
     }
 
+    @Transactional(dontRollbackOn = NoSuchElementException.class)
     public void activateClient(String username) throws UserException {
         try {
-            userRepository.getRepository().getEntityTransaction().begin();
-            User user = userRepository.get(username);
-            userRepository.getRepository().getEntityManager().lock(user, LockModeType.PESSIMISTIC_WRITE);
+//            userControlPort.getRepository().getEntityTransaction().begin();
+            User user = userInfPort.get(username);
+//            userControlPort.getRepository().getEntityManager().lock(user, LockModeType.PESSIMISTIC_WRITE);
             user.setIsActive(true);
-            userRepository.update(user);
-            userRepository.getRepository().getEntityTransaction().commit();
+            userControlPort.update(user);
+//            userControlPort.getRepository().getEntityTransaction().commit();
         } catch (NoSuchElementException e) {
-            userRepository.getRepository().getEntityTransaction().rollback();
+//            userControlPort.getRepository().getEntityTransaction().rollback();
             log.warning("Client %s does not exist".formatted(username));
             throw new UserException("Client %s does not exist".formatted(username));
         }
     }
 
+    @Transactional(dontRollbackOn = NoSuchElementException.class)
     public void changePassword(String oldPassword, String newPassword) throws UserException, ChangePasswordException {
         String username = securityContext.getCallerPrincipal().getName();
         try {
-            User user = userRepository.get(username);
+            User user = userInfPort.get(username);
             if (!user.getPassword().equals(oldPassword)) {
                 throw new ChangePasswordException("Old password is wrong.");
             }
-            userRepository.getRepository().getEntityTransaction().begin();
+//            userControlPort.getRepository().getEntityTransaction().begin();
             user.setPassword(newPassword);
-            userRepository.update(user);
-            userRepository.getRepository().getEntityTransaction().commit();
+            userControlPort.update(user);
+//            userControlPort.getRepository().getEntityTransaction().commit();
         } catch (NoSuchElementException e) {
-            userRepository.getRepository().getEntityTransaction().rollback();
+//            userControlPort.getRepository().getEntityTransaction().rollback();
             log.warning("Client %s does not exist".formatted(username));
             throw new UserException("Client %s does not exist".formatted(username));
         }
     }
 
-    public String getJwsForUser(String username) throws UserException, JOSEException {
-        try {
-            User user = getClientByUsername(username);
-            return jwsGenerator.generateJws(user.getUsername());
-        } catch (NoSuchElementException e) {
-            log.warning("Client %s does not exist".formatted(username));
-            throw new UserException("Client %s does not exist".formatted(username));
-        }
-    }
+//    public String getJwsForUser(String username) throws UserException, JOSEException {
+//        try {
+//            User user = getClientByUsername(username);
+////            return jwsGenerator.generateJws(user.getUsername());
+//        } catch (NoSuchElementException e) {
+//            log.warning("Client %s does not exist".formatted(username));
+//            throw new UserException("Client %s does not exist".formatted(username));
+//        }
+//    }
 
 }

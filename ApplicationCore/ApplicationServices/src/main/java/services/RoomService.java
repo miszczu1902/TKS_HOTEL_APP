@@ -1,8 +1,10 @@
 package services;
 
-import adapter.aggregates.ReservationRepositoryAdapter;
-import adapter.aggregates.RoomRepositoryAdapter;
+import data.control.RoomControlPort;
+import data.infrastructure.ReservationInfPort;
+import data.infrastructure.RoomInfPort;
 import exceptions.RoomException;
+import jakarta.transaction.Transactional;
 import model.dto.RoomDto;
 import model.room.Room;
 
@@ -14,71 +16,76 @@ import java.util.logging.Logger;
 public class RoomService {
 
     @Inject
-    private RoomRepositoryAdapter roomRepository;
+    private RoomInfPort roomInfPort;
 
     @Inject
-    private ReservationRepositoryAdapter reservationRepository;
+    private RoomControlPort roomControlPort;
+
+    @Inject
+    private ReservationInfPort reservationInfPort;
 
     private final Logger log = Logger.getLogger(getClass().getName());
 
     private boolean checkIfRoomCanBeRemoved(int roomNumber) {
-        return reservationRepository.getAll().stream()
+        return reservationInfPort.getAll().stream()
                 .noneMatch(reservation -> reservation.getRoom().getRoomNumber() == roomNumber);
     }
 
+    @Transactional(dontRollbackOn = NoSuchElementException.class)
     public void addRoom(RoomDto room) throws RoomException {
         try {
-            roomRepository.getRepository().getEntityTransaction().begin();
-            roomRepository.get(room.getRoomNumber());
-            roomRepository.getRepository().getEntityTransaction().rollback();
+//            roomInfPort.getRepository().getEntityTransaction().begin();
+            roomInfPort.get(room.getRoomNumber());
+//            roomInfPort.getRepository().getEntityTransaction().rollback();
             log.warning("Room %s already exists".formatted(room.getRoomNumber()));
             throw new RoomException("Room %s already exists".formatted(room.getRoomNumber()));
         } catch (NoSuchElementException e) {
-            Room roomToAdd = roomRepository.convertToRoom(room).get(0);
-            roomRepository.add(roomToAdd);
-            roomRepository.getRepository().getEntityTransaction().commit();
+            roomControlPort.add(room);
+//            roomInfPort.getRepository().getEntityTransaction().commit();
         }
     }
 
     public List<RoomDto> getAllRooms() {
-        return roomRepository.convertToRoomDto(roomRepository.getAll().toArray(new Room[0]));
+        return roomInfPort.getAll();
     }
 
     public RoomDto getRoom(int roomNumber) {
-        return roomRepository.convertToRoomDto(roomRepository.get(roomNumber)).get(0);
+        return roomInfPort.find(roomNumber).get(0);
     }
 
+    @Transactional(dontRollbackOn = NoSuchElementException.class)
     public void updateRoom(RoomDto room) throws RoomException {
         try {
-            roomRepository.getRepository().getEntityTransaction().begin();
-            Room roomToUpdate = roomRepository.get(room.getRoomNumber());
+//            roomInfPort.getRepository().getEntityTransaction().begin();
+            Room roomToUpdate = roomInfPort.get(room.getRoomNumber());
 
             roomToUpdate.setCapacity(room.getCapacity());
             roomToUpdate.setPrice(room.getPrice());
             roomToUpdate.setEquipmentType(room.getEquipmentType());
 
-            roomRepository.update(roomToUpdate);
-            roomRepository.getRepository().getEntityTransaction().commit();
+            roomControlPort.update(roomToUpdate);
+//            roomControlPort.getRepository().getEntityTransaction().commit();
 
         } catch (NoSuchElementException e) {
-            roomRepository.getRepository().getEntityTransaction().rollback();
+//            roomInfPort.getRepository().getEntityTransaction().rollback();
             log.warning("Room %s doesn't exist".formatted(room.getRoomNumber()));
             throw new RoomException("Room doesn't exist");
         }
     }
 
+    @Transactional(dontRollbackOn = NoSuchElementException.class)
     public void removeRoom(int roomNumber) throws RoomException {
         try {
-            roomRepository.getRepository().getEntityTransaction().begin();
+//            roomInfPort.getRepository().getEntityTransaction().begin();
             if (!checkIfRoomCanBeRemoved(roomNumber)) {
                 log.warning("A given room %s couldn't be removed because it's reserved".formatted(roomNumber));
                 throw new RoomException("A given room couldn't be removed because it's reserved");
             }
-            Room room = roomRepository.get(roomNumber);
-            roomRepository.remove(room);
-            roomRepository.getRepository().getEntityTransaction().commit();
+            Room room = roomInfPort.get(roomNumber);
+            roomControlPort.remove(room);
+//            roomInfPort.getRepository().getEntityTransaction().commit();
         } catch (Exception e) {
-            roomRepository.getRepository().getEntityTransaction().rollback();
+//            roomInfPort.getRepository().getEntityTransaction().rollback();
         }
     }
 }

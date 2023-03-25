@@ -3,8 +3,6 @@ package model.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.time.LocalDate;
-
 @Data
 @ToString
 @RequiredArgsConstructor

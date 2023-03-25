@@ -1,11 +1,11 @@
 package adapter.model.user;
 
+import adapter.model.RoleEnt;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import adapter.model.RoleEnt;
 
 import java.io.Serializable;
 

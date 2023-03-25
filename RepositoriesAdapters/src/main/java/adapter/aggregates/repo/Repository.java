@@ -1,6 +1,9 @@
 package adapter.aggregates.repo;
 
-import jakarta.persistence.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Persistence;
+import jakarta.persistence.PersistenceContext;
 import lombok.Data;
 
 import javax.enterprise.context.ApplicationScoped;

@@ -1,17 +1,12 @@
 package model;
 
 
-import java.io.Serializable;
-
 import lombok.*;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import model.user.User;
 import model.room.Room;
+import model.user.User;
 import org.apache.commons.math3.util.Precision;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
 
