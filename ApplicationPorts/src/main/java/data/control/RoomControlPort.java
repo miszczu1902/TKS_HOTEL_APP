@@ -1,7 +1,7 @@
 package data.control;
 
-import model.dto.RoomDto;
-import model.room.Room;
+import domain.model.dto.RoomDto;
+import domain.model.room.Room;
 
 public interface RoomControlPort {
 

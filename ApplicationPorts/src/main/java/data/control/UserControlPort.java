@@ -1,6 +1,6 @@
 package data.control;
 
-import model.user.User;
+import domain.model.user.User;
 
 public interface UserControlPort {
 

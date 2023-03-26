@@ -1,6 +1,6 @@
 package data.infrastructure;
 
-import model.Reservation;
+import domain.model.Reservation;
 
 import java.util.List;
 

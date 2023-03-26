@@ -7,7 +7,7 @@ import data.control.ReservationControlPort;
 import data.infrastructure.ReservationInfPort;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import model.Reservation;
+import domain.model.Reservation;
 
 import javax.inject.Inject;
 import java.util.Arrays;

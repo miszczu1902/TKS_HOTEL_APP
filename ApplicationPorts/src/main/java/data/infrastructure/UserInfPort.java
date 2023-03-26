@@ -1,6 +1,6 @@
 package data.infrastructure;
 
-import model.user.User;
+import domain.model.user.User;
 
 import java.util.List;
 

@@ -3,10 +3,10 @@ package services;
 import data.control.RoomControlPort;
 import data.infrastructure.ReservationInfPort;
 import data.infrastructure.RoomInfPort;
-import exceptions.RoomException;
+import domain.exceptions.RoomException;
 import jakarta.transaction.Transactional;
-import model.dto.RoomDto;
-import model.room.Room;
+import domain.model.dto.RoomDto;
+import domain.model.room.Room;
 
 import javax.inject.Inject;
 import java.util.List;

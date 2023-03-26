@@ -7,8 +7,8 @@ import data.control.RoomControlPort;
 import data.infrastructure.RoomInfPort;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import model.dto.RoomDto;
-import model.room.Room;
+import domain.model.dto.RoomDto;
+import domain.model.room.Room;
 
 import javax.inject.Inject;
 import java.util.Arrays;

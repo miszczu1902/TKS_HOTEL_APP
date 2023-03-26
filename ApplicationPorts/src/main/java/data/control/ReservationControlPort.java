@@ -1,6 +1,6 @@
 package data.control;
 
-import model.Reservation;
+import domain.model.Reservation;
 
 public interface ReservationControlPort {
 

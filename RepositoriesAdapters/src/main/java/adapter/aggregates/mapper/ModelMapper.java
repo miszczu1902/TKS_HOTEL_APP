@@ -4,11 +4,11 @@ import adapter.model.ReservationEnt;
 import adapter.model.room.EquipmentTypeEnt;
 import adapter.model.room.RoomEnt;
 import adapter.model.user.UserEnt;
-import model.Reservation;
-import model.dto.RoomDto;
-import model.room.EquipmentType;
-import model.room.Room;
-import model.user.User;
+import domain.model.Reservation;
+import domain.model.dto.RoomDto;
+import domain.model.room.EquipmentType;
+import domain.model.room.Room;
+import domain.model.user.User;
 
 public class ModelMapper {
 

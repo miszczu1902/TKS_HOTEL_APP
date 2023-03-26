@@ -7,7 +7,7 @@ import data.control.UserControlPort;
 import data.infrastructure.UserInfPort;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import model.user.User;
+import domain.model.user.User;
 
 import javax.inject.Inject;
 import java.util.Arrays;
@@ -31,13 +31,18 @@ public class UserRepositoryAdapter implements UserInfPort, UserControlPort {
     @Override
     public List<User> find(Object... elements) {
         return Optional.of(Arrays.stream(elements)
-                .map(element -> repository.getEntityManager().find(UserEnt.class, element)).map(ModelMapper::userEntToUser)
+                .map(element -> repository.getEntityManager()
+                        .find(UserEnt.class, element))
+                .map(ModelMapper::userEntToUser)
                 .collect(Collectors.toList())).orElse(Collections.emptyList());
     }
 
     @Override
     public List<User> getAll() {
-        return repository.getEntityManager().createQuery("SELECT user FROM UserEnt user", UserEnt.class).getResultList().stream().map(ModelMapper::userEntToUser).collect(Collectors.toList());
+        return repository.getEntityManager()
+                .createQuery("SELECT user FROM UserEnt user", UserEnt.class)
+                .getResultList().stream()
+                .map(ModelMapper::userEntToUser).collect(Collectors.toList());
     }
 
     @Override
@@ -57,14 +62,16 @@ public class UserRepositoryAdapter implements UserInfPort, UserControlPort {
 
     @Override
     public List<User> getAllClients() {
-        return repository.getEntityManager().createQuery("SELECT user FROM UserEnt user WHERE role = 'USER'", UserEnt.class)
+        return repository.getEntityManager()
+                .createQuery("SELECT user FROM UserEnt user WHERE role = 'USER'", UserEnt.class)
                 .getResultList().stream()
                 .map(ModelMapper::userEntToUser).collect(Collectors.toList());
     }
 
     @Override
     public List<User> getByUsername(String pattern) {
-        return repository.getEntityManager().createQuery("SELECT user FROM UserEnt user WHERE username LIKE :id", UserEnt.class)
+        return repository.getEntityManager()
+                .createQuery("SELECT user FROM UserEnt user WHERE username LIKE :id", UserEnt.class)
                 .setParameter("id", "%" + pattern + "%")
                 .getResultList().stream()
                 .map(ModelMapper::userEntToUser).collect(Collectors.toList());
@@ -72,7 +79,8 @@ public class UserRepositoryAdapter implements UserInfPort, UserControlPort {
 
     @Override
     public User getByUsernameAndPasswd(String username, String password) {
-        return repository.getEntityManager().createQuery("SELECT user FROM UserEnt user WHERE username LIKE :id AND password LIKE :password", UserEnt.class)
+        return repository.getEntityManager()
+                .createQuery("SELECT user FROM UserEnt user WHERE username LIKE :id AND password LIKE :password", UserEnt.class)
                 .setParameter("id", username)
                 .setParameter("password", password)
                 .getResultList().stream()
