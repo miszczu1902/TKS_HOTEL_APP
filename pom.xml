@@ -13,6 +13,7 @@
         <module>ApplicationCore</module>
         <module>RepositoriesAdapters</module>
         <module>ApplicationPorts</module>
+        <module>ViewInterfaces</module>
     </modules>
 
     <dependencyManagement>
@@ -187,6 +188,14 @@
                     <configuration>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>war</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
