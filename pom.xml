@@ -13,7 +13,9 @@
         <module>ApplicationCore</module>
         <module>RepositoriesAdapters</module>
         <module>ApplicationPorts</module>
-        <module>ViewInterfaces</module>
+        <module>ApplicationServicePorts</module>
+        <module>RestAdapter</module>
+        <module>SoapAdapter</module>
     </modules>
 
     <dependencyManagement>

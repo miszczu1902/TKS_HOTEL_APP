@@ -7,7 +7,6 @@ import data.control.RoomControlPort;
 import data.infrastructure.RoomInfPort;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import domain.model.dto.RoomDto;
 import domain.model.room.Room;
 
 import javax.inject.Inject;
@@ -27,30 +26,28 @@ public class RoomRepositoryAdapter implements RoomInfPort, RoomControlPort {
 
     @Override
     public Room get(Object element) {
-        return Optional.of(ModelMapper.convertToRoom(find(element).get(0))).orElseThrow();
+        return Optional.of(find(element).get(0)).orElseThrow();
     }
 
     @Override
-    public List<RoomDto> find(Object... elements) {
+    public List<Room> find(Object... elements) {
         return Optional.of(Arrays.stream(elements)
                 .map(element -> repository.getEntityManager().find(RoomEnt.class, element))
                 .map(ModelMapper::roomEntToRoom)
-                .map(ModelMapper::convertToRoomDto)
                 .collect(Collectors.toList())).orElse(Collections.emptyList());
     }
 
     @Override
-    public List<RoomDto> getAll() {
+    public List<Room> getAll() {
         return repository.getEntityManager().createQuery("SELECT room FROM RoomEnt room", RoomEnt.class)
                 .getResultList().stream()
                 .map(ModelMapper::roomEntToRoom)
-                .map(ModelMapper::convertToRoomDto).collect(Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void add(RoomDto element) {
-        repository.getEntityManager().persist(ModelMapper.roomToRoomEnt(
-                ModelMapper.convertToRoom(element)));
+    public void add(Room element) {
+        repository.getEntityManager().persist(ModelMapper.roomToRoomEnt(element));
     }
 
     @Override

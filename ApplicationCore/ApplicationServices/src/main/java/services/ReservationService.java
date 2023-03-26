@@ -10,7 +10,6 @@ import domain.exceptions.RoomException;
 import domain.exceptions.UserException;
 import jakarta.transaction.Transactional;
 import domain.model.Reservation;
-import domain.model.dto.ReservationDto;
 import domain.model.room.Room;
 
 import javax.inject.Inject;
@@ -47,17 +46,17 @@ public class ReservationService {
 
     @Transactional(dontRollbackOn = NoSuchElementException.class)
 //    @Lock(value = LockType.READ)
-    public void reserveRoom(ReservationDto reservation) throws LogicException {
+    public void reserveRoom(Reservation reservation) throws LogicException {
         try {
 //            roomControlPort.getRepository().getEntityTransaction().begin();
-            int roomNumber = reservation.getRoomNumber();
+            int roomNumber = reservation.getRoom().getRoomNumber();
             Room room = roomInfPort.get(roomNumber);
 //            roomControlPort.getRepository().getEntityManager().lock(room, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-            String username = reservation.getUsername();
+            String username = reservation.getUser().getUsername();
 
             if (userInfPort.get(username).getIsActive()) {
-                LocalDate beginTime = LocalDate.parse(reservation.getBeginTime());
-                LocalDate endTime = LocalDate.parse(reservation.getEndTime());
+                LocalDate beginTime = LocalDate.parse(reservation.getBeginTime().toString());
+                LocalDate endTime = LocalDate.parse(reservation.getEndTime().toString());
                 LocalDate now = LocalDate.now();
 
                 if (beginTime.isAfter(endTime) || endTime.isBefore(beginTime)) {

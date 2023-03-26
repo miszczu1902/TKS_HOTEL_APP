@@ -5,7 +5,6 @@ import adapter.model.room.EquipmentTypeEnt;
 import adapter.model.room.RoomEnt;
 import adapter.model.user.UserEnt;
 import domain.model.Reservation;
-import domain.model.dto.RoomDto;
 import domain.model.room.EquipmentType;
 import domain.model.room.Room;
 import domain.model.user.User;
@@ -72,13 +71,4 @@ public class ModelMapper {
         );
     }
 
-    public static RoomDto convertToRoomDto(Room room) {
-        return new RoomDto(room.getRoomNumber(), room.getCapacity(), room.getPrice(),
-                        room.getEquipmentType());
-    }
-
-    public static Room convertToRoom(RoomDto room) {
-        return new Room(room.getRoomNumber(), room.getCapacity(), room.getPrice(),
-                        room.getEquipmentType());
-    }
 }

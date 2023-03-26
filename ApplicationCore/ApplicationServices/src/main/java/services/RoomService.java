@@ -5,7 +5,6 @@ import data.infrastructure.ReservationInfPort;
 import data.infrastructure.RoomInfPort;
 import domain.exceptions.RoomException;
 import jakarta.transaction.Transactional;
-import domain.model.dto.RoomDto;
 import domain.model.room.Room;
 
 import javax.inject.Inject;
@@ -32,7 +31,7 @@ public class RoomService {
     }
 
     @Transactional(dontRollbackOn = NoSuchElementException.class)
-    public void addRoom(RoomDto room) throws RoomException {
+    public void addRoom(Room room) throws RoomException {
         try {
 //            roomInfPort.getRepository().getEntityTransaction().begin();
             roomInfPort.get(room.getRoomNumber());
@@ -45,16 +44,16 @@ public class RoomService {
         }
     }
 
-    public List<RoomDto> getAllRooms() {
+    public List<Room> getAllRooms() {
         return roomInfPort.getAll();
     }
 
-    public RoomDto getRoom(int roomNumber) {
+    public Room getRoom(int roomNumber) {
         return roomInfPort.find(roomNumber).get(0);
     }
 
     @Transactional(dontRollbackOn = NoSuchElementException.class)
-    public void updateRoom(RoomDto room) throws RoomException {
+    public void updateRoom(Room room) throws RoomException {
         try {
 //            roomInfPort.getRepository().getEntityTransaction().begin();
             Room roomToUpdate = roomInfPort.get(room.getRoomNumber());
