@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -35,7 +36,7 @@ public class ReservationController {
     @Inject
     private RestUserAdapter restUserAdapter;
 
-    @Inject
+    @Context
     private SecurityContext securityContext;
 
     @POST

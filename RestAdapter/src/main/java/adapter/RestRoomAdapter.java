@@ -9,11 +9,13 @@ import service.port.infrasturcture.RoomInfServicePort;
 import services.ReservationService;
 import services.RoomService;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@ApplicationScoped
 public class RestRoomAdapter implements RoomInfServicePort, RoomControlServicePort {
 
     @Inject

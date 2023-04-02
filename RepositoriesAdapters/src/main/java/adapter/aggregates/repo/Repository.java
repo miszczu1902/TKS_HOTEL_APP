@@ -5,15 +5,17 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.PersistenceContext;
 import lombok.Data;
+import lombok.Getter;
 
 import javax.enterprise.context.ApplicationScoped;
 
-@Data
+@Getter
 @ApplicationScoped
 public class Repository {
 
-    @PersistenceContext
-    private EntityManager entityManager = Persistence.createEntityManagerFactory("TEST_HOTEL").createEntityManager();
+    @PersistenceContext(unitName = "TEST_HOTEL")
+    private EntityManager entityManager;
+//    private EntityManager entityManager = Persistence.createEntityManagerFactory("TEST_HOTEL").createEntityManager();
 
-    private final EntityTransaction entityTransaction = entityManager.getTransaction();
+//    private final EntityTransaction entityTransaction = entityManager.getTransaction();
 }

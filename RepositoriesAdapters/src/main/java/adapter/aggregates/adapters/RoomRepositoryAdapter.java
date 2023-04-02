@@ -9,7 +9,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import domain.model.room.Room;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -18,10 +21,14 @@ import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
+@ApplicationScoped
 public class RoomRepositoryAdapter implements RoomInfPort, RoomControlPort {
 
-    @Inject
-    private Repository repository;
+//    @Inject
+//    private Repository repository;
+
+    @PersistenceContext(unitName = "TEST_HOTEL")
+    private EntityManager entityManager;
 
 
     @Override
@@ -32,14 +39,14 @@ public class RoomRepositoryAdapter implements RoomInfPort, RoomControlPort {
     @Override
     public List<Room> find(Object... elements) {
         return Optional.of(Arrays.stream(elements)
-                .map(element -> repository.getEntityManager().find(RoomEnt.class, element))
+                .map(element -> entityManager.find(RoomEnt.class, element))
                 .map(ModelMapper::roomEntToRoom)
                 .collect(Collectors.toList())).orElse(Collections.emptyList());
     }
 
     @Override
     public List<Room> getAll() {
-        return repository.getEntityManager().createQuery("SELECT room FROM RoomEnt room", RoomEnt.class)
+        return entityManager.createQuery("SELECT roomEnt FROM RoomEnt roomEnt", RoomEnt.class)
                 .getResultList().stream()
                 .map(ModelMapper::roomEntToRoom)
                 .collect(Collectors.toList());
@@ -47,17 +54,17 @@ public class RoomRepositoryAdapter implements RoomInfPort, RoomControlPort {
 
     @Override
     public void add(Room element) {
-        repository.getEntityManager().persist(ModelMapper.roomToRoomEnt(element));
+        entityManager.persist(ModelMapper.roomToRoomEnt(element));
     }
 
     @Override
     public void remove(Room... elements) {
-        Arrays.asList(elements).forEach(element -> repository.getEntityManager().remove(ModelMapper.roomToRoomEnt(element)));
+        Arrays.asList(elements).forEach(element -> entityManager.remove(ModelMapper.roomToRoomEnt(element)));
     }
 
     @Override
     public void update(Room... elements) {
-        Arrays.asList(elements).forEach(element -> repository.getEntityManager().merge(ModelMapper.roomToRoomEnt(element)));
+        Arrays.asList(elements).forEach(element -> entityManager.merge(ModelMapper.roomToRoomEnt(element)));
     }
 
 }

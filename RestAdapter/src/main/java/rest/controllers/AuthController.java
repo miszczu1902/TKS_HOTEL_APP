@@ -17,7 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-@Path("/rest/auth")
+@Path("/auth")
 @RequestScoped
 public class AuthController {
 

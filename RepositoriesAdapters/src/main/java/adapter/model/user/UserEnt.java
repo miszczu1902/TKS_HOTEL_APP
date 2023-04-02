@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(force = true)
 @Table(name = "hotel_users")
 public class UserEnt implements Serializable {
 

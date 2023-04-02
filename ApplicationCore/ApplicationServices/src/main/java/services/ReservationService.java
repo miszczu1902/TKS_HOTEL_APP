@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import domain.model.Reservation;
 import domain.model.room.Room;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+@ApplicationScoped
 public class ReservationService {
 
     @Inject
@@ -44,7 +46,7 @@ public class ReservationService {
                 .toList()).isEmpty();
     }
 
-    @Transactional(dontRollbackOn = NoSuchElementException.class)
+//    @Transactional(dontRollbackOn = NoSuchElementException.class)
 //    @Lock(value = LockType.READ)
     public void reserveRoom(Reservation reservation) throws LogicException {
         try {
@@ -84,7 +86,7 @@ public class ReservationService {
         }
     }
 
-    @Transactional(dontRollbackOn = NoSuchElementException.class)
+//    @Transactional(dontRollbackOn = NoSuchElementException.class)
 //    @Lock(value = LockType.READ)
     public void endRoomReservation(UUID reservationId) throws LogicException {
         //            reservationInfPort.getRepository().getEntityTransaction().begin();

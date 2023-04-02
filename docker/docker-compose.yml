@@ -1,6 +1,22 @@
 version: '3.8'
 
 services:
+  payara:
+    image: payara/server-full:5.2022.3
+    restart: always
+    ports:
+      - "8080:8080"
+      - "4848:4848"
+      - "8443:8443"
+    volumes:
+      - ./deployments:/opt/payara/deployments
+      - ./unnamed.war:/opt/payara/deployments/unnamed.war
+    environment:
+      - POSTGRES_USER=nbd
+      - POSTGRES_PASSWORD=nbdpassword
+      - POSTGRES_HOST=nbddb
+    depends_on:
+      - db
   db:
     image: postgres
     restart: always
@@ -9,8 +25,9 @@ services:
       POSTGRES_USER: nbd
       POSTGRES_PASSWORD: nbdpassword
     ports:
-      - 5430:5432
+      - "5432:5432"
     volumes:
       - pg:/var/lib/postgresql/data
 volumes:
   pg:
+  deployments:

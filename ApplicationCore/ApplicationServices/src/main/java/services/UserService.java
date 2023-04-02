@@ -6,13 +6,14 @@ import domain.exceptions.UserException;
 import jakarta.transaction.Transactional;
 import domain.model.user.User;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
-@RequestScoped
+@ApplicationScoped
 public class UserService {
 
     @Inject

@@ -15,7 +15,7 @@ import java.util.UUID;
 @ToString
 @RequiredArgsConstructor
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 @Entity
 @Table(name = "reservation")
 public class ReservationEnt implements Serializable {

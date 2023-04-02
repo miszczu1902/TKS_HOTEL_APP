@@ -7,11 +7,13 @@ import domain.exceptions.RoomException;
 import jakarta.transaction.Transactional;
 import domain.model.room.Room;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
+@ApplicationScoped
 public class RoomService {
 
     @Inject
@@ -30,7 +32,7 @@ public class RoomService {
                 .noneMatch(reservation -> reservation.getRoom().getRoomNumber() == roomNumber);
     }
 
-    @Transactional(dontRollbackOn = NoSuchElementException.class)
+//    @Transactional(dontRollbackOn = NoSuchElementException.class)
     public void addRoom(Room room) throws RoomException {
         try {
 //            roomInfPort.getRepository().getEntityTransaction().begin();
@@ -52,7 +54,7 @@ public class RoomService {
         return roomInfPort.find(roomNumber).get(0);
     }
 
-    @Transactional(dontRollbackOn = NoSuchElementException.class)
+//    @Transactional(dontRollbackOn = NoSuchElementException.class)
     public void updateRoom(Room room) throws RoomException {
         try {
 //            roomInfPort.getRepository().getEntityTransaction().begin();
@@ -72,7 +74,7 @@ public class RoomService {
         }
     }
 
-    @Transactional(dontRollbackOn = NoSuchElementException.class)
+//    @Transactional(dontRollbackOn = NoSuchElementException.class)
     public void removeRoom(int roomNumber) throws RoomException {
         try {
 //            roomInfPort.getRepository().getEntityTransaction().begin();

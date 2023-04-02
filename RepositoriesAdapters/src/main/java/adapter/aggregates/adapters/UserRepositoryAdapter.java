@@ -9,7 +9,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import domain.model.user.User;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -18,10 +21,11 @@ import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
+@ApplicationScoped
 public class UserRepositoryAdapter implements UserInfPort, UserControlPort {
 
-    @Inject
-    private Repository repository;
+    @PersistenceContext(unitName = "TEST_HOTEL")
+    private EntityManager entityManager;
 
     @Override
     public User get(Object element) {
@@ -31,7 +35,7 @@ public class UserRepositoryAdapter implements UserInfPort, UserControlPort {
     @Override
     public List<User> find(Object... elements) {
         return Optional.of(Arrays.stream(elements)
-                .map(element -> repository.getEntityManager()
+                .map(element -> entityManager
                         .find(UserEnt.class, element))
                 .map(ModelMapper::userEntToUser)
                 .collect(Collectors.toList())).orElse(Collections.emptyList());
@@ -39,39 +43,39 @@ public class UserRepositoryAdapter implements UserInfPort, UserControlPort {
 
     @Override
     public List<User> getAll() {
-        return repository.getEntityManager()
-                .createQuery("SELECT user FROM UserEnt user", UserEnt.class)
+        return entityManager
+                .createQuery("SELECT userEnt FROM UserEnt userEnt", UserEnt.class)
                 .getResultList().stream()
                 .map(ModelMapper::userEntToUser).collect(Collectors.toList());
     }
 
     @Override
     public void add(User user) {
-        repository.getEntityManager().persist(user);
+        entityManager.persist(user);
     }
 
     @Override
     public void remove(User... elements) {
-        Arrays.asList(elements).forEach(element -> repository.getEntityManager().remove(ModelMapper.userToUserEnt(element)));
+        Arrays.asList(elements).forEach(element -> entityManager.remove(ModelMapper.userToUserEnt(element)));
     }
 
     @Override
     public void update(User... elements) {
-        Arrays.asList(elements).forEach(element -> repository.getEntityManager().merge(ModelMapper.userToUserEnt(element)));
+        Arrays.asList(elements).forEach(element -> entityManager.merge(ModelMapper.userToUserEnt(element)));
     }
 
     @Override
     public List<User> getAllClients() {
-        return repository.getEntityManager()
-                .createQuery("SELECT user FROM UserEnt user WHERE role = 'USER'", UserEnt.class)
+        return entityManager
+                .createQuery("SELECT userEnt FROM UserEnt userEnt WHERE role = 'USER'", UserEnt.class)
                 .getResultList().stream()
                 .map(ModelMapper::userEntToUser).collect(Collectors.toList());
     }
 
     @Override
     public List<User> getByUsername(String pattern) {
-        return repository.getEntityManager()
-                .createQuery("SELECT user FROM UserEnt user WHERE username LIKE :id", UserEnt.class)
+        return entityManager
+                .createQuery("SELECT userEnt FROM UserEnt userEnt WHERE username LIKE :id", UserEnt.class)
                 .setParameter("id", "%" + pattern + "%")
                 .getResultList().stream()
                 .map(ModelMapper::userEntToUser).collect(Collectors.toList());
@@ -79,8 +83,8 @@ public class UserRepositoryAdapter implements UserInfPort, UserControlPort {
 
     @Override
     public User getByUsernameAndPasswd(String username, String password) {
-        return repository.getEntityManager()
-                .createQuery("SELECT user FROM UserEnt user WHERE username LIKE :id AND password LIKE :password", UserEnt.class)
+        return entityManager
+                .createQuery("SELECT userEnt FROM UserEnt userEnt WHERE username LIKE :id AND password LIKE :password", UserEnt.class)
                 .setParameter("id", username)
                 .setParameter("password", password)
                 .getResultList().stream()
