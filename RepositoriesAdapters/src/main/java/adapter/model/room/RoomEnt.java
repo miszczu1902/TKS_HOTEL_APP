@@ -1,9 +1,9 @@
 package adapter.model.room;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @ToString
@@ -14,7 +14,6 @@ import java.io.Serializable;
 @Entity
 @Getter
 @Setter
-@Table(name = "room")
 public class RoomEnt implements Serializable {
 
     @Id

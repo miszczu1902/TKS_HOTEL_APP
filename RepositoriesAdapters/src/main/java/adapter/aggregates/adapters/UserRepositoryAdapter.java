@@ -1,16 +1,14 @@
 package adapter.aggregates.adapters;
 
 import adapter.aggregates.mapper.ModelMapper;
-import adapter.aggregates.repo.Repository;
 import adapter.model.user.UserEnt;
 import data.control.UserControlPort;
 import data.infrastructure.UserInfPort;
+import domain.model.user.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import domain.model.user.User;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Arrays;
@@ -24,7 +22,7 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class UserRepositoryAdapter implements UserInfPort, UserControlPort {
 
-    @PersistenceContext(unitName = "TEST_HOTEL")
+    @PersistenceContext
     private EntityManager entityManager;
 
     @Override
@@ -35,8 +33,7 @@ public class UserRepositoryAdapter implements UserInfPort, UserControlPort {
     @Override
     public List<User> find(Object... elements) {
         return Optional.of(Arrays.stream(elements)
-                .map(element -> entityManager
-                        .find(UserEnt.class, element))
+                .map(element -> entityManager.find(UserEnt.class, element))
                 .map(ModelMapper::userEntToUser)
                 .collect(Collectors.toList())).orElse(Collections.emptyList());
     }
@@ -51,12 +48,7 @@ public class UserRepositoryAdapter implements UserInfPort, UserControlPort {
 
     @Override
     public void add(User user) {
-        entityManager.persist(user);
-    }
-
-    @Override
-    public void remove(User... elements) {
-        Arrays.asList(elements).forEach(element -> entityManager.remove(ModelMapper.userToUserEnt(element)));
+        entityManager.persist(ModelMapper.userToUserEnt(user));
     }
 
     @Override

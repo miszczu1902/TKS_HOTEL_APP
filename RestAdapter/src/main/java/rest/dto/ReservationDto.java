@@ -1,7 +1,8 @@
 package rest.dto;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
+
+import javax.validation.constraints.NotNull;
 
 @Data
 @ToString

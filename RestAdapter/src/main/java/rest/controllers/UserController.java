@@ -1,20 +1,18 @@
 package rest.controllers;
 
 import adapter.RestReservationAdapter;
-import adapter.RestRoomAdapter;
 import adapter.RestUserAdapter;
 import com.nimbusds.jose.JOSEException;
+import domain.exceptions.ChangePasswordException;
+import domain.exceptions.JwsException;
+import domain.exceptions.ReservationException;
+import domain.exceptions.UserException;
 import domain.model.Reservation;
 import domain.model.Role;
 import domain.model.user.User;
+import org.jetbrains.annotations.NotNull;
 import rest.auth.JwsGenerator;
 import rest.dto.*;
-import domain.exceptions.ChangePasswordException;
-import domain.exceptions.JwsException;
-import domain.exceptions.UserException;
-import domain.exceptions.ReservationException;
-
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -28,10 +26,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.logging.Logger;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Path("/users")

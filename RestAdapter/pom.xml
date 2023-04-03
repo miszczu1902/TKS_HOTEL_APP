@@ -30,6 +30,21 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>tks</groupId>
+            <artifactId>RepositoriesAdapters</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>tks</groupId>
+            <artifactId>ApplicationPorts</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>tks</groupId>
+            <artifactId>SoapAdapter</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
@@ -42,16 +57,8 @@
             <artifactId>jackson-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>jakarta.persistence</groupId>
-            <artifactId>jakarta.persistence-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-jpamodelgen-jakarta</artifactId>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
@@ -82,10 +89,6 @@
             <artifactId>javax.inject</artifactId>
         </dependency>
         <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
         </dependency>
@@ -96,10 +99,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -118,10 +117,6 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core-jakarta</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator-cdi</artifactId>
         </dependency>
@@ -137,21 +132,17 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>tks</groupId>
-            <artifactId>RepositoriesAdapters</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
         </dependency>
         <dependency>
-            <groupId>tks</groupId>
-            <artifactId>ApplicationPorts</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
         </dependency>
         <dependency>
-            <groupId>tks</groupId>
-            <artifactId>SoapAdapter</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>fish.payara.extras</groupId>
+            <artifactId>payara-embedded-all</artifactId>
         </dependency>
 
     </dependencies>

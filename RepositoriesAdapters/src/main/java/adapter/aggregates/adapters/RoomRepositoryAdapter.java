@@ -1,16 +1,14 @@
 package adapter.aggregates.adapters;
 
 import adapter.aggregates.mapper.ModelMapper;
-import adapter.aggregates.repo.Repository;
 import adapter.model.room.RoomEnt;
 import data.control.RoomControlPort;
 import data.infrastructure.RoomInfPort;
+import domain.model.room.Room;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import domain.model.room.Room;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Arrays;
@@ -24,12 +22,8 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class RoomRepositoryAdapter implements RoomInfPort, RoomControlPort {
 
-//    @Inject
-//    private Repository repository;
-
-    @PersistenceContext(unitName = "TEST_HOTEL")
+    @PersistenceContext
     private EntityManager entityManager;
-
 
     @Override
     public Room get(Object element) {

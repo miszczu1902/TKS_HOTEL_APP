@@ -8,12 +8,12 @@ import domain.exceptions.LogicException;
 import domain.exceptions.ReservationException;
 import domain.exceptions.RoomException;
 import domain.exceptions.UserException;
-import jakarta.transaction.Transactional;
 import domain.model.Reservation;
 import domain.model.room.Room;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -21,6 +21,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 @ApplicationScoped
+@Transactional(dontRollbackOn = NoSuchElementException.class)
 public class ReservationService {
 
     @Inject
@@ -46,14 +47,11 @@ public class ReservationService {
                 .toList()).isEmpty();
     }
 
-//    @Transactional(dontRollbackOn = NoSuchElementException.class)
-//    @Lock(value = LockType.READ)
+    @Transactional(dontRollbackOn = NoSuchElementException.class)
     public void reserveRoom(Reservation reservation) throws LogicException {
         try {
-//            roomControlPort.getRepository().getEntityTransaction().begin();
             int roomNumber = reservation.getRoom().getRoomNumber();
             Room room = roomInfPort.get(roomNumber);
-//            roomControlPort.getRepository().getEntityManager().lock(room, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
             String username = reservation.getUser().getUsername();
 
             if (userInfPort.get(username).getIsActive()) {
@@ -74,22 +72,17 @@ public class ReservationService {
                     Reservation newReservation = new Reservation(room, beginTime, endTime, userInfPort.get(username));
                     newReservation.calculateReservationCost();
                     reservationControlPort.add(newReservation);
-//                    roomControlPort.getRepository().getEntityTransaction().commit();
                 }
             } else {
                 throw new UserException("Client is not active");
             }
         } catch (Exception e) {
-//            roomControlPort.getRepository().getEntityTransaction().rollback();
             log.warning("Reservation couldn't be added");
             throw e;
         }
     }
 
-//    @Transactional(dontRollbackOn = NoSuchElementException.class)
-//    @Lock(value = LockType.READ)
     public void endRoomReservation(UUID reservationId) throws LogicException {
-        //            reservationInfPort.getRepository().getEntityTransaction().begin();
         LocalDate now = LocalDate.now();
         Reservation reservation = reservationInfPort.get(reservationId);
 
@@ -110,7 +103,6 @@ public class ReservationService {
             reservation.setActive(false);
             reservationControlPort.update(reservation);
         }
-//            reservationInfPort.getRepository().getEntityTransaction().commit();
     }
 
     public Reservation aboutReservation(UUID reservationId) throws ReservationException {

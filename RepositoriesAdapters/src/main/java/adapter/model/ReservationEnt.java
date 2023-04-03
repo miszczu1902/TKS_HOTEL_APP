@@ -2,11 +2,11 @@ package adapter.model;
 
 import adapter.model.room.RoomEnt;
 import adapter.model.user.UserEnt;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.apache.commons.math3.util.Precision;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -17,15 +17,15 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 @Entity
-@Table(name = "reservation")
 public class ReservationEnt implements Serializable {
 
     @Id
     @Column(name = "reservation_id")
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @NonNull
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "room_room_number", nullable = false)
     private RoomEnt room;

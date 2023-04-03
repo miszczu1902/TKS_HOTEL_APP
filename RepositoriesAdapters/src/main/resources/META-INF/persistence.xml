@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
-             version="3.0">
-    <persistence-unit name="TEST_HOTEL">
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+                                 http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"
+             version="2.2">
+    <persistence-unit name="TEST_HOTEL" transaction-type="JTA">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <jta-data-source>java:app/jdbc/TEST_HOTEL</jta-data-source>
         <class>adapter.model.user.UserEnt</class>
         <class>adapter.model.ReservationEnt</class>
         <class>adapter.model.room.RoomEnt</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/nbddb"/>
-            <property name="jakarta.persistence.jdbc.driver"
-                      value="org.postgresql.Driver"/>
-            <property name="jakarta.persistence.jdbc.user" value="nbd"/>
-            <property name="jakarta.persistence.jdbc.password" value="nbdpassword"/>
-            <property
-                    name="jakarta.persistence.schema-generation.database.action"
-                    value="create"/>
-            <property name="hibernate.connection.isolation" value="4"/>
+            <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
+            <property name="hibernate.connection.url" value="jdbc:postgresql://localhost:5432/nbddb"/>
+            <property name="hibernate.connection.username" value="nbd"/>
+            <property name="hibernate.connection.password" value="nbdpassword"/>
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
             <property name="hibernate.transaction.jta.platform"
                       value="org.hibernate.service.jta.platform.internal.SunOneJtaPlatform"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL10Dialect"/>

@@ -1,21 +1,20 @@
 package adapter.model.user;
 
 import adapter.model.RoleEnt;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Entity
 @Getter
-@Data
+@Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
 @NoArgsConstructor(force = true)
-@Table(name = "hotel_users")
 public class UserEnt implements Serializable {
 
     @Id

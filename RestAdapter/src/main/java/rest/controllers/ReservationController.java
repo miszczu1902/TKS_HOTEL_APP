@@ -3,13 +3,13 @@ package rest.controllers;
 import adapter.RestReservationAdapter;
 import adapter.RestRoomAdapter;
 import adapter.RestUserAdapter;
+import domain.exceptions.LogicException;
+import domain.exceptions.ReservationException;
 import domain.model.Reservation;
 import domain.model.room.Room;
 import domain.model.user.User;
 import rest.dto.ReservationDto;
 import rest.dto.ReservationSelfDto;
-import domain.exceptions.LogicException;
-import domain.exceptions.ReservationException;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;

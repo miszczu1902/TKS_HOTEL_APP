@@ -1,9 +1,9 @@
 package domain.model;
 
 
-import lombok.*;
 import domain.model.room.Room;
 import domain.model.user.User;
+import lombok.*;
 import org.apache.commons.math3.util.Precision;
 
 import java.io.Serializable;
