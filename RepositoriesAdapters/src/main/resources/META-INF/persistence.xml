@@ -17,12 +17,13 @@
             <property name="hibernate.connection.username" value="nbd"/>
             <property name="hibernate.connection.password" value="nbdpassword"/>
             <property name="hibernate.hbm2ddl.auto" value="create"/>
+            <property name="hibernate.hbm2ddl.import_files" value="init.sql"/>
             <property name="hibernate.transaction.jta.platform"
                       value="org.hibernate.service.jta.platform.internal.SunOneJtaPlatform"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL10Dialect"/>
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
-            <property name="javax.persistence.schema-generation.database.action" value="create"/>
+<!--            <property name="javax.persistence.schema-generation.database.action" value="create"/>-->
         </properties>
     </persistence-unit>
 </persistence>

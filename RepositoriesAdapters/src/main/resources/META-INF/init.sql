@@ -1,4 +1,4 @@
-create table rooment
+create table if not exists rooment
 (
     room_number    integer          not null
         primary key,
@@ -8,10 +8,10 @@ create table rooment
     version        bigint
 );
 
-alter table rooment
+alter table if exists rooment
     owner to nbd;
 
-create table userent
+create table if not exists userent
 (
     username     varchar(255) not null
         primary key,
@@ -28,10 +28,10 @@ create table userent
     streetnumber varchar(4)
 );
 
-alter table userent
+alter table if exists userent
     owner to nbd;
 
-create table reservationent
+create table if not exists reservationent
 (
     reservation_id     uuid             not null
         primary key,
@@ -47,7 +47,7 @@ create table reservationent
             references userent
 );
 
-alter table reservationent
+alter table if exists reservationent
     owner to nbd;
 
 
