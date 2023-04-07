@@ -53,7 +53,10 @@ public class RoomRepositoryAdapter implements RoomInfPort, RoomControlPort {
 
     @Override
     public void remove(Room... elements) {
-        Arrays.asList(elements).forEach(element -> entityManager.remove(ModelMapper.roomToRoomEnt(element)));
+        Arrays.asList(elements).forEach(element -> {
+            RoomEnt room = entityManager.merge(ModelMapper.roomToRoomEnt(element));
+            entityManager.remove(room);
+        });
     }
 
     @Override

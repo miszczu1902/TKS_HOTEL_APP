@@ -10,5 +10,4 @@ public interface ReservationControlPort {
 
     void update(Reservation... elements);
 
-
 }

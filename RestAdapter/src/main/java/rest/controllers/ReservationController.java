@@ -53,7 +53,7 @@ public class ReservationController {
             );
             return Response.created(URI.create("/Reservations/%s".formatted(reservation.getRoomNumber()))).build();
         } catch (ReservationException | ValidationException e) {
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
         }
     }
 
@@ -73,7 +73,7 @@ public class ReservationController {
                     user));
             return Response.created(URI.create("/Reservations/%s".formatted(reservation.getRoomNumber()))).build();
         } catch (ReservationException | ValidationException e) {
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
         }
     }
 
@@ -86,9 +86,9 @@ public class ReservationController {
             restReservationAdapter.endReserveRoom(reservationId);
             return Response.ok().build();
         } catch (NoSuchElementException e) {
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
         } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
         }
     }
 
@@ -107,7 +107,7 @@ public class ReservationController {
         try {
             return Response.ok().entity(restReservationAdapter.getReservationById(reservationId)).build();
         } catch (ReservationException e) {
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
         }
     }
 }

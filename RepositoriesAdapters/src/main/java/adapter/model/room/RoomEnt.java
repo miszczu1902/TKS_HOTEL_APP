@@ -18,6 +18,7 @@ public class RoomEnt implements Serializable {
 
     @Id
     @NonNull
+    @NotNull
     @Column(name = "room_number", nullable = false)
     private Integer roomNumber;
 

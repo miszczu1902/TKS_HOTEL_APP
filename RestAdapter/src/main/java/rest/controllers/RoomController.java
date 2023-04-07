@@ -49,7 +49,7 @@ public class RoomController {
             return Response.created(URI.create("/rooms/%s".formatted(room.getRoomNumber()))).build();
         } catch (RoomException e) {
             log.warning("Room already exists %s ".formatted(room.getRoomNumber()));
-            return Response.status(Response.Status.CONFLICT.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.CONFLICT.getStatusCode()).build();
         } catch (ValidationException e) {
             String message = "Room validation failed for room: %s ".formatted(room);
             log.warning(message);
@@ -70,10 +70,12 @@ public class RoomController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getRoom(@PathParam("roomNumber") int roomNumber) {
         try {
-            return Response.ok().entity(restRoomAdapter.getRoom(roomNumber)).build();
+            Room room = restRoomAdapter.getRoom(roomNumber);
+            RoomDto roomDto = new RoomDto(roomNumber, room.getCapacity(), room.getPrice(), room.getEquipmentType());
+            return Response.ok().entity(roomDto).build();
         } catch (NoSuchElementException e) {
             log.warning("Room %s does not exist. ".formatted(roomNumber));
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
         }
     }
 
@@ -91,7 +93,7 @@ public class RoomController {
             restRoomAdapter.updateRoom(oldRoom);
             return Response.status(Response.Status.NO_CONTENT).build();
         } catch (RoomException e) {
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
         } catch (ValidationException e) {
             String message = "Room validation failed for room: %s ".formatted(room);
             log.warning(message);
@@ -105,12 +107,13 @@ public class RoomController {
     @Path("/{roomNumber}")
     public Response removeRoom(@PathParam("roomNumber") int roomNumber) {
         try {
-            restRoomAdapter.removeRoom(restRoomAdapter.getRoom(roomNumber));
+            Room room = restRoomAdapter.getRoom(roomNumber);
+            restRoomAdapter.removeRoom(room);
             return Response.status(Response.Status.NO_CONTENT).build();
         } catch (RoomException e) {
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
         } catch (NoSuchElementException e) {
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
         }
     }
 
@@ -121,14 +124,16 @@ public class RoomController {
     public Response getRoomWithReservations(@PathParam("roomNumber") int roomNumber) {
         try {
             Room room = restRoomAdapter.getRoom(roomNumber);
-            RoomDto roomDto = new RoomDto(room.getRoomNumber(), room.getCapacity(), room.getPrice(), room.getEquipmentType());
-            List<Reservation> reservation = restReservationAdapter.getReservationsForRoom(roomNumber);
-            List<ReservationForRoomsDto> reservations = reservation.stream().
-                    map(reservation1 -> new ReservationForRoomsDto(reservation1.getBeginTime(),
-                            reservation1.getEndTime(), reservation1.getUser().getUsername())).collect(Collectors.toList());
+
+            List<Reservation> reservationsForRoom = restReservationAdapter.getReservationsForRoom(roomNumber);
+            List<ReservationForRoomsDto> reservations = reservationsForRoom.stream().
+                    map(reservation -> new ReservationForRoomsDto(reservation.getBeginTime(),
+                            reservation.getEndTime(), reservation.getUser().getUsername()))
+                    .collect(Collectors.toList());
             RoomWithReservationDto roomWithReservationDto =
                     new RoomWithReservationDto(room.getRoomNumber(), room.getCapacity(), room.getPrice(),
                             room.getEquipmentType(), reservations);
+
             return Response.ok().entity(roomWithReservationDto).build();
         } catch (NoSuchElementException e) {
             log.warning("Room %s does not exist.".formatted(roomNumber));

@@ -8,7 +8,7 @@ import java.io.Serializable;
 @ToString
 @AllArgsConstructor
 @RequiredArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 @EqualsAndHashCode(exclude = {"capacity", "price", "equipmentType", "version"})
 public class Room implements Serializable {
     @NonNull

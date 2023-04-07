@@ -12,4 +12,6 @@ public interface ReservationInfPort {
 
     Reservation get(Object element);
 
+    List<Reservation> getReservationsByRoomNumber(Integer roomNumber);
+
 }

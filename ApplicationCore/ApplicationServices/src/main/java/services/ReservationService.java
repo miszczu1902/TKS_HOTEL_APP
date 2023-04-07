@@ -15,9 +15,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
 @ApplicationScoped
@@ -36,15 +34,18 @@ public class ReservationService {
     @Inject
     private ReservationControlPort reservationControlPort;
 
-
     private final Logger log = Logger.getLogger(getClass().getName());
 
     private boolean checkIfRoomCantBeReserved(int roomNumber, LocalDate beginTime) {
-        return !(reservationInfPort.getAll().stream()
-                .filter(reservation -> reservation.getRoom().getRoomNumber().equals(roomNumber) &&
-                        (beginTime.isBefore(reservation.getEndTime()) ||
-                                beginTime.equals(reservation.getEndTime())))
-                .toList()).isEmpty();
+        List<Reservation> reservations = Optional.of(reservationInfPort.getAll()).orElse(Collections.emptyList());
+        if (reservations.isEmpty()) {
+            return false;
+        } else {
+            return !(reservations.stream().filter(reservation ->
+                            reservation.getRoom().getRoomNumber().equals(roomNumber)
+                                    && (beginTime.isBefore(reservation.getEndTime()) || beginTime.equals(reservation.getEndTime())))
+                    .toList()).isEmpty();
+        }
     }
 
     @Transactional(dontRollbackOn = NoSuchElementException.class)
@@ -115,7 +116,7 @@ public class ReservationService {
     }
 
     public List<Reservation> getAllReservations() {
-        return reservationInfPort.getAll();
+        return Optional.ofNullable(reservationInfPort.getAll()).orElse(Collections.emptyList());
     }
 
     public List<Reservation> getReservationsForClient(String username) throws ReservationException {
@@ -129,7 +130,7 @@ public class ReservationService {
 
     public List<Reservation> getReservationsForRoom(int roomNumber) throws ReservationException {
         try {
-            return reservationInfPort.find(roomNumber);
+            return reservationInfPort.getReservationsByRoomNumber(roomNumber);
         } catch (NoSuchElementException e) {
             log.warning("Any reservation for a given room with number %s doesn't exist".formatted(roomNumber));
             throw new ReservationException("Any reservation for a given condition doesn't exist");

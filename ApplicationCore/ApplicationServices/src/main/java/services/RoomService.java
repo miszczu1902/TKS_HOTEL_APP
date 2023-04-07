@@ -48,7 +48,7 @@ public class RoomService {
     }
 
     public Room getRoom(int roomNumber) {
-        return roomInfPort.find(roomNumber).get(0);
+        return roomInfPort.get(roomNumber);
     }
 
     public void updateRoom(Room room) throws RoomException {

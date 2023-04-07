@@ -1,19 +1,16 @@
 package adapter;
 
-import domain.exceptions.ReservationException;
 import domain.exceptions.RoomException;
-import domain.model.Reservation;
 import domain.model.room.Room;
+import rest.dto.RoomDto;
 import service.port.control.RoomControlServicePort;
 import service.port.infrasturcture.RoomInfServicePort;
-import services.ReservationService;
 import services.RoomService;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 @ApplicationScoped
 public class RestRoomAdapter implements RoomInfServicePort, RoomControlServicePort {
@@ -21,24 +18,20 @@ public class RestRoomAdapter implements RoomInfServicePort, RoomControlServicePo
     @Inject
     private RoomService roomService;
 
-    @Inject
-    private ReservationService reservationService;
 
-    @Override
-    public List<Room> getAllRooms() {
-        return roomService.getAllRooms();
+    public List<RoomDto> getAllRooms() {
+        return roomService.getAllRooms().stream()
+                .map(room -> new RoomDto(
+                        room.getRoomNumber(),
+                        room.getCapacity(),
+                        room.getPrice(),
+                        room.getEquipmentType()))
+                .toList();
     }
 
     @Override
     public Room getRoom(int roomNumber) {
         return roomService.getRoom(roomNumber);
-    }
-
-    @Override
-    public Map<Room, List<Reservation>> getRoomWithReservations(int roomNumber) throws ReservationException {
-        Map<Room, List<Reservation>> roomWithReservations = new HashMap<>();
-        roomWithReservations.put(roomService.getRoom(roomNumber), reservationService.getReservationsForRoom(roomNumber));
-        return roomWithReservations;
     }
 
     @Override

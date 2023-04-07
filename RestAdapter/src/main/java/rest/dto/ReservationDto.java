@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @ToString
 @RequiredArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 public class ReservationDto {
 
     @NonNull

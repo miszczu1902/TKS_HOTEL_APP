@@ -31,11 +31,24 @@ public class ReservationRepositoryAdapter implements ReservationInfPort, Reserva
     }
 
     @Override
+    public List<Reservation> getReservationsByRoomNumber(Integer roomNumber) {
+        return Optional.of(entityManager
+                        .createQuery("SELECT reservationEnt FROM ReservationEnt reservationEnt " +
+                                "WHERE reservationEnt.room.roomNumber = :roomNumber", ReservationEnt.class)
+                        .setParameter("roomNumber", roomNumber)
+                        .getResultList().stream()
+                        .map(ModelMapper::reservationEntToReservation)
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
+    }
+
+    @Override
     public List<Reservation> find(Object... elements) {
         return Optional.of(Arrays.stream(elements)
-                .map(element -> entityManager.find(ReservationEnt.class, element))
-                .map(ModelMapper::reservationEntToReservation)
-                .collect(Collectors.toList())).orElse(Collections.emptyList());
+                        .map(element -> entityManager.find(ReservationEnt.class, element))
+                        .map(ModelMapper::reservationEntToReservation)
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
     }
 
     @Override
@@ -43,20 +56,20 @@ public class ReservationRepositoryAdapter implements ReservationInfPort, Reserva
         return entityManager
                 .createQuery("SELECT reservationEnt FROM ReservationEnt reservationEnt", ReservationEnt.class)
                 .getResultList().stream()
-                .map(ModelMapper::reservationEntToReservation).collect(Collectors.toList());
-    }
-
-    public List<Reservation> getReservationsForClient(String username) {
-        return entityManager
-                .createQuery("SELECT reservationEnt FROM ReservationEnt reservationEnt WHERE reservationEnt.user.username = :username", ReservationEnt.class)
-                .setParameter("username", username)
-                .getResultList().stream()
-                .map(ModelMapper::reservationEntToReservation).collect(Collectors.toList());
+                .map(ModelMapper::reservationEntToReservation)
+                .collect(Collectors.toList());
     }
 
     @Override
     public void add(Reservation element) {
-        entityManager.persist(element);
+        ReservationEnt reservationEnt = new ReservationEnt(
+                ModelMapper.roomToRoomEnt(element.getRoom()),
+                element.getBeginTime(),
+                element.getEndTime(),
+                ModelMapper.userToUserEnt(element.getUser()),
+                element.getReservationCost()
+        );
+        entityManager.persist(reservationEnt);
     }
 
     @Override
@@ -69,14 +82,6 @@ public class ReservationRepositoryAdapter implements ReservationInfPort, Reserva
     public void update(Reservation... elements) {
         Arrays.asList(elements).forEach(element -> entityManager
                 .merge(ModelMapper.reservationToReservationEnt(element)));
-    }
-
-    public List<Reservation> getReservationsForRoom(int roomNumber) {
-        return entityManager
-                .createQuery("SELECT reservationEnt FROM ReservationEnt reservationEnt WHERE reservationEnt.room.roomNumber = :roomNumber", ReservationEnt.class)
-                .setParameter("roomNumber", roomNumber)
-                .getResultList().stream()
-                .map(ModelMapper::reservationEntToReservation).collect(Collectors.toList());
     }
 
 }

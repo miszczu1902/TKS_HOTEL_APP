@@ -3,7 +3,6 @@ package adapter.model;
 import adapter.model.room.RoomEnt;
 import adapter.model.user.UserEnt;
 import lombok.*;
-import org.apache.commons.math3.util.Precision;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -20,14 +19,13 @@ import java.util.UUID;
 public class ReservationEnt implements Serializable {
 
     @Id
-    @Column(name = "reservation_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "reservation_id")
     private UUID id;
 
     @NonNull
-    @NotNull
     @ManyToOne
-    @JoinColumn(name = "room_room_number", nullable = false)
+    @JoinColumn(name = "room_number", nullable = false)
     private RoomEnt room;
 
     @NonNull
@@ -40,28 +38,16 @@ public class ReservationEnt implements Serializable {
 
     @NonNull
     @ManyToOne
-    @JoinColumn(name = "client_personal_id", nullable = false)
+    @JoinColumn(name = "username", nullable = false)
     private UserEnt user;
 
+    @NonNull
     @NotNull
     @Column(name = "reservation_cost", nullable = false)
-    private double reservationCost;
+    private Double reservationCost;
 
     @NotNull
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
-    public int getRentDays() {
-        return endTime.getDayOfYear() - beginTime.getDayOfYear();
-    }
-
-    public void calculateReservationCost() {
-        reservationCost = Precision.round(getRentDays() * room.getPrice(), 2);
-        if (reservationCost < 0) {
-            reservationCost = 0;
-        }
-        if (getRentDays() == 0) {
-            Precision.round((getRentDays() + 1) * room.getPrice(), 2);
-        }
-    }
 }

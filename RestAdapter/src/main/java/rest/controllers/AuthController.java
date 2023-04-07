@@ -27,7 +27,9 @@ public class AuthController {
     @Inject
     private AuthIdentityStore authIdentityStore;
 
-    private final JwtGenerator jwtGenerator = new JwtGenerator();
+    @Inject
+    private JwtGenerator jwtGenerator;
+
 
     @POST
     @Path("/login")
@@ -37,10 +39,10 @@ public class AuthController {
         UsernamePasswordCredential usernamePasswordCredential = new UsernamePasswordCredential(loginDto.getUsername(), loginDto.getPassword());
         CredentialValidationResult credentialValidationResult = authIdentityStore.validate(usernamePasswordCredential);
 
-        if(credentialValidationResult.getStatus().equals(CredentialValidationResult.Status.VALID)) {
+        if (credentialValidationResult.getStatus().equals(CredentialValidationResult.Status.VALID)) {
             String jwt = jwtGenerator.generateJWT(loginDto.getUsername(), credentialValidationResult.getCallerGroups().iterator().next());
             return Response.ok().entity(jwt).build();
         }
-        return Response.status(Response.Status.UNAUTHORIZED).build();
+        return Response.status(Response.Status.UNAUTHORIZED).type(MediaType.APPLICATION_JSON).build();
     }
 }

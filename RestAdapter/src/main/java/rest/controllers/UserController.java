@@ -44,7 +44,8 @@ public class UserController {
     @Inject
     private SecurityContext securityContext;
 
-    private final JwsGenerator jwsGenerator = new JwsGenerator();
+    @Inject
+    private JwsGenerator jwsGenerator;
 
     private final Logger log = Logger.getLogger(getClass().getName());
 
@@ -56,7 +57,7 @@ public class UserController {
             String jws = getJwsForUser(username);
             return Response.noContent().header("ETag", jws).build();
         } catch (UserException e) {
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
         } catch (JOSEException e) {
             return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
         }
@@ -104,7 +105,7 @@ public class UserController {
                             user.getIsActive())).toList();
             return Response.ok().entity(users).build();
         } catch (NoSuchElementException e) {
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
         }
     }
 
@@ -143,7 +144,7 @@ public class UserController {
                     user.getPostalCode()));
             return Response.created(URI.create("/users/%s".formatted(user.getUsername()))).build();
         } catch (UserException e) {
-            return Response.status(Response.Status.CONFLICT.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.CONFLICT.getStatusCode()).build();
         } catch (ValidationException e) {
             String message = "User validation failed for user: %s".formatted(user.toString());
             log.warning(message);
@@ -174,9 +175,9 @@ public class UserController {
 
             return Response.status(Response.Status.NO_CONTENT).build();
         } catch (UserException e) {
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
         } catch (BadRequestException | JwsException | IllegalArgumentException e) {
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
         }
     }
 
@@ -190,7 +191,7 @@ public class UserController {
             return Response.status(Response.Status.NO_CONTENT).build();
         } catch (NoSuchElementException | UserException e) {
             log.warning("User %s does not exist.".formatted(username));
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
         }
     }
 
@@ -204,7 +205,7 @@ public class UserController {
             return Response.status(Response.Status.NO_CONTENT).build();
         } catch (NoSuchElementException | UserException e) {
             log.warning("Client %s does not exist.".formatted(username));
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
         }
     }
 
@@ -232,9 +233,9 @@ public class UserController {
             changePassword(passwordDto.getOldPassword(), passwordDto.getNewPassword());
             return Response.ok().build();
         } catch (UserException e) {
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
         } catch (ChangePasswordException | ValidationException e) {
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
         }
     }
 
@@ -255,10 +256,10 @@ public class UserController {
             return Response.ok().entity(userWithReservationsDto).build();
         } catch (NoSuchElementException e) {
             log.warning("Client %s does not exist.".formatted(username));
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
         } catch (ReservationException e) {
             log.warning("Not found reservations for client %s".formatted(username));
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage()).build();
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
         }
     }
 
