@@ -8,7 +8,7 @@ create table if not exists rooment
     version        bigint
 );
 
-alter table if exists rooment
+alter table rooment
     owner to nbd;
 
 create table if not exists userent
@@ -28,26 +28,26 @@ create table if not exists userent
     streetnumber varchar(4)
 );
 
-alter table if exists userent
+alter table userent
     owner to nbd;
 
 create table if not exists reservationent
 (
-    reservation_id     uuid             not null
+    reservation_id   uuid             not null
         primary key,
-    begin_time         date             not null,
-    end_time           date             not null,
-    is_active          boolean          not null,
-    reservation_cost   double precision not null,
-    room_room_number   integer          not null
-        constraint fkm283f25sipq5wh7u8b7uaumix
+    begin_time       date             not null,
+    end_time         date             not null,
+    is_active        boolean          not null,
+    reservation_cost double precision not null,
+    room_number      integer          not null
+        constraint fk9smxd5jtducps3stbrfv7e52x
             references rooment,
-    client_personal_id varchar(255)     not null
-        constraint fkmnnda0148vtl9x4fhtm7ykuwp
+    username         varchar(255)     not null
+        constraint fkhkw32s8wxpwyclvkn8yuewyw
             references userent
 );
 
-alter table if exists reservationent
+alter table reservationent
     owner to nbd;
 
 
