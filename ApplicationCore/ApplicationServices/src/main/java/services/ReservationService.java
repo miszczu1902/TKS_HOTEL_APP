@@ -10,6 +10,8 @@ import domain.exceptions.RoomException;
 import domain.exceptions.UserException;
 import domain.model.Reservation;
 import domain.model.room.Room;
+import service.port.control.ReservationControlServicePort;
+import service.port.infrasturcture.ReservationInfServicePort;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -20,7 +22,7 @@ import java.util.logging.Logger;
 
 @ApplicationScoped
 @Transactional(dontRollbackOn = NoSuchElementException.class)
-public class ReservationService {
+public class ReservationService implements ReservationInfServicePort, ReservationControlServicePort {
 
     @Inject
     private UserInfPort userInfPort;
@@ -48,6 +50,7 @@ public class ReservationService {
         }
     }
 
+    @Override
     @Transactional(dontRollbackOn = NoSuchElementException.class)
     public void reserveRoom(Reservation reservation) throws LogicException {
         try {
@@ -83,9 +86,10 @@ public class ReservationService {
         }
     }
 
-    public void endRoomReservation(UUID reservationId) throws LogicException {
+    @Override
+    public void endReserveRoom(String reservationId) throws LogicException {
         LocalDate now = LocalDate.now();
-        Reservation reservation = reservationInfPort.get(reservationId);
+        Reservation reservation = reservationInfPort.get(UUID.fromString(reservationId));
 
         if (reservation.getBeginTime().isAfter(now)) {
             reservationControlPort.remove(reservation);
@@ -106,19 +110,22 @@ public class ReservationService {
         }
     }
 
-    public Reservation aboutReservation(UUID reservationId) throws ReservationException {
+    @Override
+    public Reservation getReservationById(String reservationId) throws ReservationException {
         try {
-            return reservationInfPort.get(reservationId);
+            return reservationInfPort.get(UUID.fromString(reservationId));
         } catch (NoSuchElementException e) {
             log.warning("Any reservation for a given id %s doesn't exist".formatted(reservationId));
             throw new ReservationException("Any reservation for a given condition doesn't exist");
         }
     }
 
+    @Override
     public List<Reservation> getAllReservations() {
         return Optional.ofNullable(reservationInfPort.getAll()).orElse(Collections.emptyList());
     }
 
+    @Override
     public List<Reservation> getReservationsForClient(String username) throws ReservationException {
         try {
             return reservationInfPort.find(username);
@@ -128,6 +135,7 @@ public class ReservationService {
         }
     }
 
+    @Override
     public List<Reservation> getReservationsForRoom(int roomNumber) throws ReservationException {
         try {
             return reservationInfPort.getReservationsByRoomNumber(roomNumber);

@@ -5,59 +5,54 @@ import domain.exceptions.UserException;
 import domain.model.user.User;
 import service.port.control.UserControlServicePort;
 import service.port.infrasturcture.UserInfServicePort;
-import services.UserService;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.List;
 
-public class RestUserAdapter implements UserInfServicePort, UserControlServicePort {
+@ApplicationScoped
+public class RestUserAdapter {
 
     @Inject
-    private UserService userService;
+    private UserInfServicePort userInfServicePort;
 
-    @Override
+    @Inject
+    private UserControlServicePort userControlServicePort;
+
     public void addUser(User user) throws UserException {
-        userService.addClientToHotel(user);
+        userControlServicePort.addUser(user);
     }
 
-    @Override
     public void updateUser(User user, String jws) throws UserException, JwsException {
-        userService.modifyClient(user);
+        userControlServicePort.updateUser(user, jws);
     }
 
-    @Override
     public void activateUser(String username) throws UserException {
-        userService.activateClient(username);
+        userControlServicePort.activateUser(username);
     }
 
-    @Override
     public void deactivateUser(String username) throws UserException {
-        userService.deactivateClient(username);
+        userControlServicePort.deactivateUser(username);
     }
 
-    @Override
     public List<User> getAllUsers() {
-        return userService.getAllUsers();
+        return userInfServicePort.getAllUsers();
     }
 
-    @Override
     public List<User> getAllClients() {
-        return userService.getAllClients();
+        return userInfServicePort.getAllClients();
     }
 
-    @Override
     public List<User> getUsersByUsername(String pattern) {
-        return userService.getClientsByUsername(pattern);
+        return userInfServicePort.getUsersByUsername(pattern);
     }
 
-    @Override
     public User getUser(String username) {
-        return userService.getClientByUsername(username);
+        return userInfServicePort.getUser(username);
     }
 
-    @Override
     public User getByUsernameAndPassword(String username, String password) {
-        return userService.getByUsernameAndPasswd(username, password);
+        return userInfServicePort.getByUsernameAndPassword(username, password);
     }
 
 }

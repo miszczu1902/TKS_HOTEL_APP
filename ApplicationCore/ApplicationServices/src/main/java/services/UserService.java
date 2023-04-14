@@ -1,25 +1,26 @@
 package services;
 
-import adapter.aggregates.mapper.ModelMapper;
-import adapter.model.user.UserEnt;
+import control.UserControlSoapPort;
 import data.control.UserControlPort;
-import data.infrastructure.SpecifiedUserInfPort;
 import data.infrastructure.UserInfPort;
+import domain.exceptions.JwsException;
 import domain.exceptions.UserException;
 import domain.model.Role;
 import domain.model.user.User;
+import infrastructure.UserInfSoapPort;
+import service.port.control.UserControlServicePort;
+import service.port.infrasturcture.UserInfServicePort;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.logging.Logger;
 
 @ApplicationScoped
 @Transactional(dontRollbackOn = NoSuchElementException.class)
-public class UserService {
+public class UserService implements UserControlSoapPort, UserInfSoapPort, UserControlServicePort, UserInfServicePort {
 
     @Inject
     private UserControlPort userControlPort;
@@ -27,58 +28,52 @@ public class UserService {
     @Inject
     private UserInfPort userInfPort;
 
-    @Inject
-    private SpecifiedUserInfPort specifiedUserInfPort;
-
     private final Logger log = Logger.getLogger(getClass().getName());
 
+    @Override
     public List<User> getAllUsers() {
         return userInfPort.getAll();
     }
 
-    public List<User> getAllClients() {
-        return userInfPort.getAllClients();
-    }
-
-    public List<User> getClientsByUsername(String pattern) {
-        return userInfPort.getByUsername(pattern);
-    }
-
-    public User getClientByUsername(String username) {
-        return userInfPort.get(username);
-    }
-
-    public void addClientToHotel(User client) throws UserException {
+    @Override
+    public void addUser(User user) throws UserException {
         try {
-            userInfPort.get(client.getUsername());
-            log.warning("Client %s already exists".formatted(client.getUsername()));
-            throw new UserException("Client %s already exists".formatted(client.getUsername()));
+            userInfPort.get(user.getUsername());
+            log.warning("Client %s already exists".formatted(user.getUsername()));
+            throw new UserException("Client %s already exists".formatted(user.getUsername()));
         } catch (NoSuchElementException e) {
-            userControlPort.add(client);
+            userControlPort.add(user);
         }
     }
 
-    public void modifyClient(User client) throws UserException {
-        try {
-            User oldUser = userInfPort.get(client.getUsername());
+    @Override
+    public void updateUser(User user, String jws) throws UserException, JwsException {
+        this.modifyUser(user);
+    }
 
-            oldUser.setUsername(client.getUsername());
-            oldUser.setFirstName(client.getFirstName());
-            oldUser.setLastName(client.getLastName());
-            oldUser.setCity(client.getCity());
-            oldUser.setStreet(client.getStreet());
-            oldUser.setStreetNumber(client.getStreetNumber());
-            oldUser.setPostalCode(client.getPostalCode());
-            oldUser.setRole(client.getRole());
+    @Override
+    public void modifyUser(User user) throws UserException {
+        try {
+            User oldUser = userInfPort.get(user.getUsername());
+
+            oldUser.setUsername(user.getUsername());
+            oldUser.setFirstName(user.getFirstName());
+            oldUser.setLastName(user.getLastName());
+            oldUser.setCity(user.getCity());
+            oldUser.setStreet(user.getStreet());
+            oldUser.setStreetNumber(user.getStreetNumber());
+            oldUser.setPostalCode(user.getPostalCode());
+            oldUser.setRole(user.getRole());
 
             userControlPort.update(oldUser);
         } catch (NoSuchElementException e) {
-            log.warning("Client %s does not exist".formatted(client.getUsername()));
-            throw new UserException("Client %s does not exist".formatted(client.getUsername()));
+            log.warning("Client %s does not exist".formatted(user.getUsername()));
+            throw new UserException("Client %s does not exist".formatted(user.getUsername()));
         }
     }
 
-    public void deactivateClient(String username) throws UserException {
+    @Override
+    public void deactivateUser(String username) throws UserException {
         try {
             User user = userInfPort.get(username);
             user.setIsActive(false);
@@ -89,7 +84,8 @@ public class UserService {
         }
     }
 
-    public void activateClient(String username) throws UserException {
+    @Override
+    public void activateUser(String username) throws UserException {
         try {
             User user = userInfPort.get(username);
             user.setIsActive(true);
@@ -100,28 +96,57 @@ public class UserService {
         }
     }
 
-    public User getByUsernameAndPasswd(String username, String password) {
+    @Override
+    public List<User> getAllClients() {
+        return userInfPort.getAllClients();
+    }
+
+    @Override
+    public List<User> getUsersByUsername(String pattern) {
+        return userInfPort.getByUsername(pattern);
+    }
+
+    @Override
+    public User getUser(String username) {
+        return userInfPort.get(username);
+    }
+
+    @Override
+    public User getByUsernameAndPassword(String username, String password) {
         return userInfPort.getByUsernameAndPasswd(username, password);
     }
 
+    @Override
     public List<User> getAllModerators() {
-        return specifiedUserInfPort.getAllModerators();
+        return userInfPort.getAll().stream()
+                .filter(mod -> mod.getRole() == Role.MODERATOR).toList();
     }
 
+    @Override
     public List<User> getAllAdmins() {
-        return specifiedUserInfPort.getAllAdmins();
+        return userInfPort.getAll().stream()
+                .filter(mod -> mod.getRole() == Role.ADMIN).toList();
     }
 
+    @Override
     public User getClient(String username) {
-        return specifiedUserInfPort.getClient(username);
+        return this.getAllClients().stream()
+                .filter(client -> client.getUsername().equals(username))
+                .toList().get(0);
     }
 
+    @Override
     public User getModerator(String username) {
-        return specifiedUserInfPort.getModerator(username);
+        return this.getAllModerators().stream()
+                .filter(client -> client.getUsername().equals(username))
+                .toList().get(0);
     }
 
+    @Override
     public User getAdmin(String username) {
-        return specifiedUserInfPort.getAdmin(username);
+        return this.getAllAdmins().stream()
+                .filter(client -> client.getUsername().equals(username))
+                .toList().get(0);
     }
 
 }

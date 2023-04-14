@@ -1,7 +1,8 @@
 package adapter;
 
-import control.SpecifiedUserControlPort;
-import data.infrastructure.SpecifiedUserInfPort;
+import control.UserControlSoapPort;
+import domain.exceptions.UserException;
+import infrastructure.UserInfSoapPort;
 import mapper.SoapMapper;
 import model.UserSoap;
 
@@ -17,51 +18,52 @@ import java.util.List;
 public class SoapHotelAdapter {
 
     @Inject
-    private SpecifiedUserInfPort specifiedUserInfPort;
+    private UserInfSoapPort userInfSoapPort;
 
-    private SpecifiedUserControlPort specifiedUserControlPort;
+    @Inject
+    private UserControlSoapPort userControlSoapPort;
 
     @WebMethod
     public List<UserSoap> getAllClients() {
-        return specifiedUserInfPort.getAllClients().stream()
+        return userInfSoapPort.getAllClients().stream()
                 .map(SoapMapper::userToUserSoap).toList();
     }
 
     @WebMethod
     public List<UserSoap> getAllModerators() {
-        return specifiedUserInfPort.getAllModerators().stream()
+        return userInfSoapPort.getAllModerators().stream()
                 .map(SoapMapper::userToUserSoap).toList();
     }
 
     @WebMethod
     public List<UserSoap> getAllAdmins() {
-        return specifiedUserInfPort.getAllAdmins().stream()
+        return userInfSoapPort.getAllAdmins().stream()
                 .map(SoapMapper::userToUserSoap).toList();
     }
 
     @WebMethod
     public UserSoap getClient(@WebParam String username) {
-        return SoapMapper.userToUserSoap(specifiedUserInfPort.getClient(username));
+        return SoapMapper.userToUserSoap(userInfSoapPort.getClient(username));
     }
 
     @WebMethod
     public UserSoap getModerator(@WebParam String username) {
-        return SoapMapper.userToUserSoap(specifiedUserInfPort.getModerator(username));
+        return SoapMapper.userToUserSoap(userInfSoapPort.getModerator(username));
     }
 
     @WebMethod
     public UserSoap getAdmin(@WebParam String username) {
-        return SoapMapper.userToUserSoap(specifiedUserInfPort.getAdmin(username));
+        return SoapMapper.userToUserSoap(userInfSoapPort.getAdmin(username));
     }
 
     @WebMethod
-    public void addUser(UserSoap user) {
-        specifiedUserControlPort.addUser(SoapMapper.userSoapToUser(user));
+    public void addUser(UserSoap user) throws UserException {
+        userControlSoapPort.addUser(SoapMapper.userSoapToUser(user));
     }
 
     @WebMethod
-    public void modifyUser(UserSoap user) {
-        specifiedUserControlPort.modifyUser(SoapMapper.userSoapToUser(user));
+    public void modifyUser(UserSoap user) throws UserException {
+        userControlSoapPort.modifyUser(SoapMapper.userSoapToUser(user));
     }
 
 }

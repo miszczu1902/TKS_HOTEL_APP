@@ -2,45 +2,39 @@ package adapter;
 
 import domain.exceptions.RoomException;
 import domain.model.room.Room;
-import rest.dto.RoomDto;
 import service.port.control.RoomControlServicePort;
 import service.port.infrasturcture.RoomInfServicePort;
-import services.RoomService;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.List;
 
-
 @ApplicationScoped
-public class RestRoomAdapter implements RoomInfServicePort, RoomControlServicePort {
+public class RestRoomAdapter {
 
     @Inject
-    private RoomService roomService;
+    private RoomInfServicePort roomInfServicePort;
 
+    @Inject
+    private RoomControlServicePort roomControlServicePort;
 
-    @Override
     public List<Room> getAllRooms() {
-        return roomService.getAllRooms();
+        return roomInfServicePort.getAllRooms();
     }
 
-    @Override
     public Room getRoom(int roomNumber) {
-        return roomService.getRoom(roomNumber);
+        return roomInfServicePort.getRoom(roomNumber);
     }
 
-    @Override
     public void addRoom(Room room) throws RoomException {
-        roomService.addRoom(room);
+        roomControlServicePort.addRoom(room);
     }
 
-    @Override
     public void updateRoom(Room room) throws RoomException {
-        roomService.updateRoom(room);
+        roomControlServicePort.updateRoom(room);
     }
 
-    @Override
     public void removeRoom(Room room) throws RoomException {
-        roomService.removeRoom(room.getRoomNumber());
+        roomControlServicePort.removeRoom(room.getRoomNumber());
     }
 }

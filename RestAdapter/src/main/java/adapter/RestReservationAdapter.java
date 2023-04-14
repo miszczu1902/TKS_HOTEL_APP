@@ -3,51 +3,44 @@ package adapter;
 import domain.exceptions.LogicException;
 import domain.exceptions.ReservationException;
 import domain.model.Reservation;
-import domain.model.room.Room;
-import domain.model.user.User;
 import service.port.control.ReservationControlServicePort;
 import service.port.infrasturcture.ReservationInfServicePort;
-import services.ReservationService;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 @ApplicationScoped
-public class RestReservationAdapter implements ReservationInfServicePort, ReservationControlServicePort {
+public class RestReservationAdapter {
 
     @Inject
-    private ReservationService reservationService;
+    private ReservationInfServicePort reservationInfServicePort;
 
-    @Override
+    @Inject
+    private ReservationControlServicePort reservationControlServicePort;
+    
     public void reserveRoom(Reservation reservation) throws LogicException {
-        reservationService.reserveRoom(reservation);
+        reservationControlServicePort.reserveRoom(reservation);
     }
 
-    @Override
     public void endReserveRoom(String reservationId) throws LogicException {
-        reservationService.endRoomReservation(UUID.fromString(reservationId));
+        reservationControlServicePort.endReserveRoom(reservationId);
     }
 
-    @Override
     public List<Reservation> getAllReservations() {
-        return reservationService.getAllReservations();
+        return reservationInfServicePort.getAllReservations();
     }
 
-    @Override
     public Reservation getReservationById(String reservationId) throws ReservationException {
-        return reservationService.aboutReservation(UUID.fromString(reservationId));
+        return reservationInfServicePort.getReservationById(reservationId);
     }
 
-    @Override
     public List<Reservation> getReservationsForClient(String username) throws ReservationException {
-        return reservationService.getReservationsForClient(username);
+        return reservationInfServicePort.getReservationsForClient(username);
     }
-    @Override
+
     public List<Reservation> getReservationsForRoom(int roomNumber) throws ReservationException {
-        return reservationService.getReservationsForRoom(roomNumber);
+        return reservationInfServicePort.getReservationsForRoom(roomNumber);
     }
 
 }

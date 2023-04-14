@@ -5,6 +5,8 @@ import data.infrastructure.ReservationInfPort;
 import data.infrastructure.RoomInfPort;
 import domain.exceptions.RoomException;
 import domain.model.room.Room;
+import service.port.control.RoomControlServicePort;
+import service.port.infrasturcture.RoomInfServicePort;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -15,7 +17,7 @@ import java.util.logging.Logger;
 
 @ApplicationScoped
 @Transactional(dontRollbackOn = NoSuchElementException.class)
-public class RoomService {
+public class RoomService implements RoomInfServicePort, RoomControlServicePort {
 
     @Inject
     private RoomInfPort roomInfPort;
@@ -33,6 +35,7 @@ public class RoomService {
                 .noneMatch(reservation -> reservation.getRoom().getRoomNumber() == roomNumber);
     }
 
+    @Override
     public void addRoom(Room room) throws RoomException {
         try {
             roomInfPort.get(room.getRoomNumber());
@@ -43,14 +46,17 @@ public class RoomService {
         }
     }
 
+    @Override
     public List<Room> getAllRooms() {
         return roomInfPort.getAll();
     }
 
+    @Override
     public Room getRoom(int roomNumber) {
         return roomInfPort.get(roomNumber);
     }
 
+    @Override
     public void updateRoom(Room room) throws RoomException {
         try {
             Room roomToUpdate = roomInfPort.get(room.getRoomNumber());
@@ -67,6 +73,7 @@ public class RoomService {
         }
     }
 
+    @Override
     public void removeRoom(int roomNumber) throws RoomException {
         if (!checkIfRoomCanBeRemoved(roomNumber)) {
             log.warning("A given room %s couldn't be removed because it's reserved".formatted(roomNumber));

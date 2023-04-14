@@ -3,7 +3,6 @@ package adapter.aggregates.adapters;
 import adapter.aggregates.mapper.ModelMapper;
 import adapter.model.user.UserEnt;
 import data.control.UserControlPort;
-import data.infrastructure.SpecifiedUserInfPort;
 import data.infrastructure.UserInfPort;
 import domain.model.user.User;
 import lombok.Getter;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 @ApplicationScoped
-public class UserRepositoryAdapter implements UserInfPort, UserControlPort, SpecifiedUserInfPort {
+public class UserRepositoryAdapter implements UserInfPort, UserControlPort {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -83,45 +82,6 @@ public class UserRepositoryAdapter implements UserInfPort, UserControlPort, Spec
                 .getResultList().stream()
                 .map(ModelMapper::userEntToUser)
                 .toList().get(0);
-    }
-
-    @Override
-    public List<User> getAllModerators() {
-        return entityManager
-                .createQuery("SELECT userEnt FROM UserEnt userEnt WHERE role = 'MODERATOR'", UserEnt.class)
-                .getResultList().stream()
-                .map(ModelMapper::userEntToUser)
-                .toList();
-    }
-
-    @Override
-    public List<User> getAllAdmins() {
-        return entityManager
-                .createQuery("SELECT userEnt FROM UserEnt userEnt WHERE role = 'ADMIN'", UserEnt.class)
-                .getResultList().stream()
-                .map(ModelMapper::userEntToUser)
-                .toList();
-    }
-
-    @Override
-    public User getClient(String username) {
-        return Optional.ofNullable(getAllClients().stream()
-                .filter(client -> client.getUsername().equals(username))
-                .toList().get(0)).orElseThrow();
-    }
-
-    @Override
-    public User getModerator(String username) {
-        return Optional.ofNullable(getAllModerators().stream()
-                .filter(mod -> mod.getUsername().equals(username))
-                .toList().get(0)).orElseThrow();
-    }
-
-    @Override
-    public User getAdmin(String username) {
-        return Optional.ofNullable(getAllAdmins().stream()
-                .filter(admin -> admin.getUsername().equals(username))
-                .toList().get(0)).orElseThrow();
     }
 
 }

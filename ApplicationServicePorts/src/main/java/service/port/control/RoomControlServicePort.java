@@ -9,6 +9,6 @@ public interface RoomControlServicePort {
 
     void updateRoom(Room room) throws RoomException;
 
-    void removeRoom(Room room) throws RoomException;
+    void removeRoom(int roomNumber) throws RoomException;
 
 }
