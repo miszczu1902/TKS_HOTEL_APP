@@ -1,5 +1,6 @@
 package adapter;
 
+import control.SpecifiedUserControlPort;
 import data.infrastructure.SpecifiedUserInfPort;
 import mapper.SoapMapper;
 import model.UserSoap;
@@ -17,6 +18,8 @@ public class SoapHotelAdapter {
 
     @Inject
     private SpecifiedUserInfPort specifiedUserInfPort;
+
+    private SpecifiedUserControlPort specifiedUserControlPort;
 
     @WebMethod
     public List<UserSoap> getAllClients() {
@@ -49,6 +52,16 @@ public class SoapHotelAdapter {
     @WebMethod
     public UserSoap getAdmin(@WebParam String username) {
         return SoapMapper.userToUserSoap(specifiedUserInfPort.getAdmin(username));
+    }
+
+    @WebMethod
+    public void addUser(UserSoap user) {
+        specifiedUserControlPort.addUser(SoapMapper.userSoapToUser(user));
+    }
+
+    @WebMethod
+    public void modifyUser(UserSoap user) {
+        specifiedUserControlPort.modifyUser(SoapMapper.userSoapToUser(user));
     }
 
 }

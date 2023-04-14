@@ -1,5 +1,6 @@
 package mapper;
 
+import domain.model.Role;
 import domain.model.user.User;
 import model.UserSoap;
 
@@ -16,6 +17,21 @@ public class SoapMapper {
                 user.getPostalCode(),
                 user.getRole().toString(),
                 user.getIsActive()
+        );
+    }
+
+    public static User userSoapToUser(UserSoap user) {
+        return new User(
+                user.getUsername(),
+                user.getPassword(),
+                user.getFirstName(),
+                user.getLastName(),
+                Role.valueOf(user.getRole()),
+                user.getIsActive(),
+                user.getCity(),
+                user.getStreet(),
+                user.getStreetNumber(),
+                user.getPostalCode()
         );
     }
 

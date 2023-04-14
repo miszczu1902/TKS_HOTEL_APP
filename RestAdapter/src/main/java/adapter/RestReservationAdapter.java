@@ -9,11 +9,13 @@ import service.port.control.ReservationControlServicePort;
 import service.port.infrasturcture.ReservationInfServicePort;
 import services.ReservationService;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+@ApplicationScoped
 public class RestReservationAdapter implements ReservationInfServicePort, ReservationControlServicePort {
 
     @Inject
@@ -47,4 +49,5 @@ public class RestReservationAdapter implements ReservationInfServicePort, Reserv
     public List<Reservation> getReservationsForRoom(int roomNumber) throws ReservationException {
         return reservationService.getReservationsForRoom(roomNumber);
     }
+
 }

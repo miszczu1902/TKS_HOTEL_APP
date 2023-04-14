@@ -17,6 +17,8 @@ public class UserSoap {
     @Size(min = 6, max = 20)
     private String username;
 
+    private String password;
+
     @NonNull
     @NotEmpty
     @Size(min = 3, max = 35)
@@ -46,4 +48,32 @@ public class UserSoap {
     @NotNull
     @NonNull
     private Boolean isActive;
+
+    public UserSoap(@NonNull String username, @NonNull String firstName, @NonNull String lastName,
+                    String city, String street, String streetNumber, String postalCode,
+                    @NonNull String role, @NonNull Boolean isActive) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.city = city;
+        this.street = street;
+        this.streetNumber = streetNumber;
+        this.postalCode = postalCode;
+        this.role = role;
+        this.isActive = isActive;
+    }
+
+    public UserSoap(@NonNull String username, @NonNull String password, @NonNull String firstName, @NonNull String lastName,
+                    String city, String street, String streetNumber, String postalCode) {
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.city = city;
+        this.street = street;
+        this.streetNumber = streetNumber;
+        this.postalCode = postalCode;
+    }
+
+
 }
