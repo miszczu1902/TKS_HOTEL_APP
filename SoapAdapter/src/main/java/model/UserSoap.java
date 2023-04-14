@@ -1,4 +1,4 @@
-package rest.dto;
+package model;
 
 import lombok.*;
 
@@ -8,11 +8,9 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Data
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-@EqualsAndHashCode
-public class GetUserDto {
+public class UserSoap {
 
     @NonNull
     @NotEmpty

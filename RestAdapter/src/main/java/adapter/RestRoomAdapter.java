@@ -19,14 +19,9 @@ public class RestRoomAdapter implements RoomInfServicePort, RoomControlServicePo
     private RoomService roomService;
 
 
-    public List<RoomDto> getAllRooms() {
-        return roomService.getAllRooms().stream()
-                .map(room -> new RoomDto(
-                        room.getRoomNumber(),
-                        room.getCapacity(),
-                        room.getPrice(),
-                        room.getEquipmentType()))
-                .toList();
+    @Override
+    public List<Room> getAllRooms() {
+        return roomService.getAllRooms();
     }
 
     @Override

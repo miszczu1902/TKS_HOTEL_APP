@@ -25,11 +25,6 @@ public class RestReservationAdapter implements ReservationInfServicePort, Reserv
     }
 
     @Override
-    public void reserveRoomByClient(Room room, User user, LocalDate beginTime, LocalDate endTime) throws LogicException {
-        reservationService.reserveRoom(new Reservation(room, beginTime, endTime, user));
-    }
-
-    @Override
     public void endReserveRoom(String reservationId) throws LogicException {
         reservationService.endRoomReservation(UUID.fromString(reservationId));
     }

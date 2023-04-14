@@ -1,8 +1,12 @@
 package services;
 
+import adapter.aggregates.mapper.ModelMapper;
+import adapter.model.user.UserEnt;
 import data.control.UserControlPort;
+import data.infrastructure.SpecifiedUserInfPort;
 import data.infrastructure.UserInfPort;
 import domain.exceptions.UserException;
+import domain.model.Role;
 import domain.model.user.User;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -10,6 +14,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 @ApplicationScoped
@@ -21,6 +26,9 @@ public class UserService {
 
     @Inject
     private UserInfPort userInfPort;
+
+    @Inject
+    private SpecifiedUserInfPort specifiedUserInfPort;
 
     private final Logger log = Logger.getLogger(getClass().getName());
 
@@ -94,6 +102,26 @@ public class UserService {
 
     public User getByUsernameAndPasswd(String username, String password) {
         return userInfPort.getByUsernameAndPasswd(username, password);
+    }
+
+    public List<User> getAllModerators() {
+        return specifiedUserInfPort.getAllModerators();
+    }
+
+    public List<User> getAllAdmins() {
+        return specifiedUserInfPort.getAllAdmins();
+    }
+
+    public User getClient(String username) {
+        return specifiedUserInfPort.getClient(username);
+    }
+
+    public User getModerator(String username) {
+        return specifiedUserInfPort.getModerator(username);
+    }
+
+    public User getAdmin(String username) {
+        return specifiedUserInfPort.getAdmin(username);
     }
 
 }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE resources PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 3.1 Resource Definitions//EN" "http://glassfish.org/dtds/glassfish-resources_1_5.dtd">
+
+<resources>
+    <jdbc-connection-pool datasource-classname="org.postgresql.ds.PGConnectionPoolDataSource"
+                          res-type="javax.sql.ConnectionPoolDataSource" name="TEST_HOTEL">
+        <property name="serverName" value="localhost"/>
+        <property name="portNumber" value="5432"/>
+        <property name="databaseName" value="nbddb"/>
+        <property name="user" value="nbd"/>
+        <property name="password" value="nbdpassword"/>
+    </jdbc-connection-pool>
+    <jdbc-resource pool-name="TEST_HOTEL" jndi-name="jdbc/TEST_HOTEL"/>
+</resources>

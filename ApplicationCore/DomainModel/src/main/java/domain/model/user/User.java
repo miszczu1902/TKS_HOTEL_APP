@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.io.Serializable;
 
-@Getter
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -32,7 +31,6 @@ public class User implements Serializable {
 
     private String city;
 
-
     private String street;
 
     private String streetNumber;
@@ -50,4 +48,5 @@ public class User implements Serializable {
         this.streetNumber = streetNumber;
         this.postalCode = postalCode;
     }
+
 }
