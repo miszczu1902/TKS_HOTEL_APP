@@ -2,8 +2,8 @@ package adapter.aggregates.adapters;
 
 import adapter.aggregates.mapper.ModelMapper;
 import adapter.model.ReservationEnt;
-import data.control.ReservationControlPort;
-import data.infrastructure.ReservationInfPort;
+import data.port.control.ReservationControlPort;
+import data.port.infrastructure.ReservationInfPort;
 import domain.model.Reservation;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

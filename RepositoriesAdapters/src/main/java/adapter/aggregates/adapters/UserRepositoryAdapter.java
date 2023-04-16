@@ -2,8 +2,8 @@ package adapter.aggregates.adapters;
 
 import adapter.aggregates.mapper.ModelMapper;
 import adapter.model.user.UserEnt;
-import data.control.UserControlPort;
-import data.infrastructure.UserInfPort;
+import data.port.control.UserControlPort;
+import data.port.infrastructure.UserInfPort;
 import domain.model.user.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

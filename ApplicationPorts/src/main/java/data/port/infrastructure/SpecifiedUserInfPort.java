@@ -1,10 +1,10 @@
-package infrastructure;
+package data.port.infrastructure;
 
 import domain.model.user.User;
 
 import java.util.List;
 
-public interface UserInfSoapPort {
+public interface SpecifiedUserInfPort {
 
     List<User> getAllClients();
 

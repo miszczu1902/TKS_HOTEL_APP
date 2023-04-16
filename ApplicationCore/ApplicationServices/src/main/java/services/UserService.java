@@ -1,15 +1,15 @@
 package services;
 
-import control.UserControlSoapPort;
-import data.control.UserControlPort;
-import data.infrastructure.UserInfPort;
+import data.port.control.UserControlPort;
+import data.port.infrastructure.UserInfPort;
 import domain.exceptions.JwsException;
 import domain.exceptions.UserException;
 import domain.model.Role;
 import domain.model.user.User;
-import infrastructure.UserInfSoapPort;
 import service.port.control.UserControlServicePort;
 import service.port.infrasturcture.UserInfServicePort;
+import soap.port.control.UserControlSoapPort;
+import soap.port.infrastructure.UserInfSoapPort;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

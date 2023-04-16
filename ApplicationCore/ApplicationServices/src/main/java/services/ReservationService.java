@@ -1,9 +1,9 @@
 package services;
 
-import data.control.ReservationControlPort;
-import data.infrastructure.ReservationInfPort;
-import data.infrastructure.RoomInfPort;
-import data.infrastructure.UserInfPort;
+import data.port.control.ReservationControlPort;
+import data.port.infrastructure.ReservationInfPort;
+import data.port.infrastructure.RoomInfPort;
+import data.port.infrastructure.UserInfPort;
 import domain.exceptions.LogicException;
 import domain.exceptions.ReservationException;
 import domain.exceptions.RoomException;

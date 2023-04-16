@@ -1,4 +1,4 @@
-package data.infrastructure;
+package data.port.infrastructure;
 
 import domain.model.room.Room;
 

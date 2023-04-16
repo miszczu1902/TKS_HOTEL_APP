@@ -1,19 +1,19 @@
-package adapter;
+package soap.adapter;
 
-import control.UserControlSoapPort;
 import domain.exceptions.UserException;
-import infrastructure.UserInfSoapPort;
-import mapper.SoapMapper;
-import model.UserSoap;
+import soap.mapper.SoapMapper;
+import soap.model.UserSoap;
+import soap.port.control.UserControlSoapPort;
+import soap.port.infrastructure.UserInfSoapPort;
 
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import java.util.List;
 
-@RequestScoped
+@ApplicationScoped
 @WebService(serviceName = "UserService")
 public class SoapHotelAdapter {
 

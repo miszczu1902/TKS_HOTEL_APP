@@ -2,8 +2,8 @@ package adapter.aggregates.adapters;
 
 import adapter.aggregates.mapper.ModelMapper;
 import adapter.model.room.RoomEnt;
-import data.control.RoomControlPort;
-import data.infrastructure.RoomInfPort;
+import data.port.control.RoomControlPort;
+import data.port.infrastructure.RoomInfPort;
 import domain.model.room.Room;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

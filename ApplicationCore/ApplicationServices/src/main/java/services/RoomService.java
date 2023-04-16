@@ -1,8 +1,8 @@
 package services;
 
-import data.control.RoomControlPort;
-import data.infrastructure.ReservationInfPort;
-import data.infrastructure.RoomInfPort;
+import data.port.control.RoomControlPort;
+import data.port.infrastructure.ReservationInfPort;
+import data.port.infrastructure.RoomInfPort;
 import domain.exceptions.RoomException;
 import domain.model.room.Room;
 import service.port.control.RoomControlServicePort;

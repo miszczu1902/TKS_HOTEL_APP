@@ -1,4 +1,4 @@
-package control;
+package soap.port.control;
 
 import domain.exceptions.UserException;
 import domain.model.user.User;
