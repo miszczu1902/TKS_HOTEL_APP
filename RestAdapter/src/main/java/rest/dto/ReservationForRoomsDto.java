@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Data
 @ToString
 @RequiredArgsConstructor
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
 @EqualsAndHashCode
 public class ReservationForRoomsDto {
 

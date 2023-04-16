@@ -1,32 +1,37 @@
 package soap.adpater;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import domain.model.Role;
-import org.junit.Before;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.BeforeClass;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import soap.model.UserSoap;
 
 import javax.xml.soap.*;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
 public class AbstractSoapTest {
 
     protected static final String ENDPOINT_URL = "http://localhost:8080/UserService";
     protected static final String NAMESPACE_URI = "http://adapter.soap/";
-    protected static final String PREFIX = "UserService";
+    protected static final String PREFIX = "ns2";
+    protected static final String SOAP_ENV = "http://schemas.xmlsoap.org/soap/envelope/";
     protected static SOAPConnectionFactory soapConnectionFactory;
     protected static SOAPConnection soapConnection;
     protected static MessageFactory messageFactory;
     protected static Logger logger = Logger.getLogger(AbstractSoapTest.class.getName());
+    protected static XmlMapper mapper = new XmlMapper();
 
-//    @BeforeEach
-//    public void initTest() throws SOAPException {
-////        soapConnectionFactory = SOAPConnectionFactory.newInstance();
-////        soapConnection = soapConnectionFactory.createConnection();
-////        messageFactory = MessageFactory.newInstance();
-//    }
+    @BeforeClass
+    public static void initTest() {
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+    }
 
-    protected int getUsers(Role role) throws SOAPException {
+    protected int getUsers(Role role) throws Exception {
         soapConnectionFactory = SOAPConnectionFactory.newInstance();
         soapConnection = soapConnectionFactory.createConnection();
         messageFactory = MessageFactory.newInstance();
@@ -35,15 +40,18 @@ public class AbstractSoapTest {
         SOAPPart soapPart = soapMessage.getSOAPPart();
 
         SOAPEnvelope envelope = soapPart.getEnvelope();
+        envelope.addNamespaceDeclaration("SOAP-ENV", SOAP_ENV);
+        envelope.addNamespaceDeclaration("ns2", NAMESPACE_URI);
         SOAPBody soapBody = envelope.getBody();
 
         switch (role) {
             case ADMIN -> soapBody.addChildElement("getAllAdmins", PREFIX, NAMESPACE_URI);
             case MODERATOR -> soapBody.addChildElement("getAllModerators", PREFIX, NAMESPACE_URI);
-            default -> soapBody.addChildElement("getAllUsers", PREFIX, NAMESPACE_URI);
+            default -> soapBody.addChildElement("getAllClients", PREFIX, NAMESPACE_URI);
         }
 
         SOAPMessage soapResponse = soapConnection.call(soapMessage, ENDPOINT_URL);
+        log("XML Response", soapResponse);
 
         SOAPBody responseBody = soapResponse.getSOAPBody();
         soapConnection.close();
@@ -51,7 +59,48 @@ public class AbstractSoapTest {
         return responseBody.getChildElements().next().getChildNodes().getLength();
     }
 
-    protected SOAPMessage createUser(Role role) throws SOAPException {
+    protected String getUser(String username, Role role) throws Exception {
+        soapConnectionFactory = SOAPConnectionFactory.newInstance();
+        soapConnection = soapConnectionFactory.createConnection();
+        messageFactory = MessageFactory.newInstance();
+
+        SOAPMessage soapMessage = messageFactory.createMessage();
+        SOAPPart soapPart = soapMessage.getSOAPPart();
+
+        SOAPEnvelope envelope = soapPart.getEnvelope();
+        envelope.addNamespaceDeclaration("SOAP-ENV", SOAP_ENV);
+        envelope.addNamespaceDeclaration("ns2", NAMESPACE_URI);
+
+        SOAPBody soapBody = envelope.getBody();
+        String method;
+
+        switch (role) {
+            case ADMIN -> method = "getAllAdmins";
+            case MODERATOR -> method = "getAllModerators";
+            default -> method = "getAllClients";
+        }
+
+        SOAPElement element = soapBody.addChildElement(method, PREFIX);
+        soapBody.addChildElement("arg0").setTextContent(username);
+        log("XML Request", soapMessage);
+
+        SOAPMessage soapResponse = soapConnection.call(soapMessage, ENDPOINT_URL);
+        log("XML Response", soapResponse);
+
+        SOAPBody responseBody = soapResponse.getSOAPBody();
+        soapConnection.close();
+
+        NodeList nodes = responseBody.getElementsByTagName("return");
+        if (nodes.getLength() > 0) {
+            Element userElement = (Element) nodes.item(0);
+            return userElement.getElementsByTagName("username").item(0).getTextContent();
+        } else {
+            return "";
+        }
+
+    }
+
+    protected SOAPMessage createUser(Role role) throws Exception {
         soapConnectionFactory = SOAPConnectionFactory.newInstance();
         soapConnection = soapConnectionFactory.createConnection();
         messageFactory = MessageFactory.newInstance();
@@ -59,16 +108,16 @@ public class AbstractSoapTest {
         SOAPPart soapPart = message.getSOAPPart();
 
         SOAPEnvelope envelope = soapPart.getEnvelope();
-        envelope.addNamespaceDeclaration(PREFIX, NAMESPACE_URI + "/SoapHotelAdapter/addUserRequest");
+        envelope.addNamespaceDeclaration(PREFIX, NAMESPACE_URI);
 
         UserSoap userSoap = new UserSoap(
-                "zaq12wsxcde34rfv",
-                RandomStringUtils.randomAlphabetic(10),
-                RandomStringUtils.randomAlphabetic(10),
-                RandomStringUtils.randomAlphabetic(10),
-                RandomStringUtils.randomAlphabetic(10),
-                RandomStringUtils.randomAlphabetic(10),
-                RandomStringUtils.randomAlphabetic(10),
+                RandomStringUtils.randomAlphabetic(10) + role.toString(),
+                "examplePassword",
+                "John",
+                "Doe",
+                "ExampleCity",
+                "ExampleStreet",
+                "123",
                 "12-345",
                 role.toString(),
                 true
@@ -76,37 +125,29 @@ public class AbstractSoapTest {
 
         SOAPBody requestBody = envelope.getBody();
         SOAPElement createUser = requestBody.addChildElement("addUser", PREFIX);
-        SOAPElement user = createUser.addChildElement("userSoap");
-        user.addChildElement("city").setTextContent(userSoap.getCity());
-//        user.addChildElement("city").setTextContent("abcdef");
-//        user.addChildElement("city", userSoap.getCity());
-        user.addChildElement("firstName").setTextContent(userSoap.getFirstName());
+        SOAPElement user = createUser.addChildElement("arg0");
 
-//        user.addChildElement("firstName", userSoap.getFirstName());
+        user.addChildElement("username").setTextContent(userSoap.getUsername());
+        user.addChildElement("password").setTextContent(userSoap.getPassword());
+        user.addChildElement("firstName").setTextContent(userSoap.getFirstName());
+        user.addChildElement("lastName").setTextContent(userSoap.getLastName());
+        user.addChildElement("city").setTextContent(userSoap.getCity());
+        user.addChildElement("street").setTextContent(userSoap.getStreet());
+        user.addChildElement("streetNumber").setTextContent(userSoap.getStreetNumber());
+        user.addChildElement("postalCode").setTextContent(userSoap.getPostalCode());
+        user.addChildElement("role").setTextContent(userSoap.getRole());
         user.addChildElement("isActive").setTextContent(userSoap.getIsActive().toString());
 
-//        user.addChildElement("isActive", userSoap.getIsActive().toString());
-        user.addChildElement("lastName").setTextContent(userSoap.getLastName());
-
-//        user.addChildElement("lastName", userSoap.getLastName());
-        user.addChildElement("postalCode").setTextContent(userSoap.getPostalCode());
-
-//        user.addChildElement("postalCode", userSoap.getPostalCode());
-        user.addChildElement("role").setTextContent(userSoap.getRole());
-
-//        user.addChildElement("role", userSoap.getRole());
-//        user.addChildElement("street", userSoap.getStreet());
-        user.addChildElement("street").setTextContent(userSoap.getStreet());
-//        user.addChildElement("streetNumber", userSoap.getStreetNumber());
-        user.addChildElement("streetNumber").setTextContent(userSoap.getStreetNumber());
-//        user.addChildElement("username", userSoap.getUsername());
-        user.addChildElement("username").setTextContent(userSoap.getUsername());
-//        user.addChildElement("password", userSoap.getPassword());
-        user.addChildElement("password").setTextContent(userSoap.getPassword());
+        log("XML Request", message);
         message.saveChanges();
 
         return message;
     }
 
+    protected void log(String msg, SOAPMessage soapMessage) throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        soapMessage.writeTo(out);
+        logger.info(msg + ":\n " + mapper.writeValueAsString(out.toString(StandardCharsets.UTF_8)));
+    }
 
 }

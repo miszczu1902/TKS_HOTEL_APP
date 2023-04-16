@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @ToString
 @RequiredArgsConstructor
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
 @EqualsAndHashCode
 public class RoomWithReservationDto implements Comparator<ReservationForRoomsDto> {
 

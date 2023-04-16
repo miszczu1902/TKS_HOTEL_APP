@@ -9,7 +9,7 @@ import java.io.Serializable;
 @ToString
 @AllArgsConstructor
 @RequiredArgsConstructor
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
 @EqualsAndHashCode(exclude = {"capacity", "price", "equipmentTypeEnt", "version"})
 @Entity
 @Getter

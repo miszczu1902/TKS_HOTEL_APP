@@ -61,9 +61,4 @@ public class SoapHotelAdapter {
         userControlSoapPort.addUser(SoapMapper.userSoapToUser(user));
     }
 
-    @WebMethod
-    public void modifyUser(UserSoap user) throws UserException {
-        userControlSoapPort.modifyUser(SoapMapper.userSoapToUser(user));
-    }
-
 }

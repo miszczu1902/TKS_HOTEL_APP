@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 @Data
 @ToString
 @AllArgsConstructor
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
 @EqualsAndHashCode
 public class GetUserDto {
 
