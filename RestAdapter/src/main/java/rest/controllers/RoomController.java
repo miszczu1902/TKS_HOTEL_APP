@@ -6,6 +6,7 @@ import domain.exceptions.ReservationException;
 import domain.exceptions.RoomException;
 import domain.model.Reservation;
 import domain.model.room.Room;
+import mapper.RestMapper;
 import rest.dto.ReservationForRoomsDto;
 import rest.dto.RoomDto;
 import rest.dto.RoomWithReservationDto;
@@ -40,12 +41,7 @@ public class RoomController {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addRoom(@Valid RoomDto room) {
         try {
-            restRoomAdapter.addRoom(new Room(
-                    room.getRoomNumber(),
-                    room.getCapacity(),
-                    room.getPrice(),
-                    room.getEquipmentType()
-            ));
+            restRoomAdapter.addRoom(RestMapper.roomDtoToRoom(room));
             return Response.created(URI.create("/rooms/%s".formatted(room.getRoomNumber()))).build();
         } catch (RoomException e) {
             log.warning("Room already exists %s ".formatted(room.getRoomNumber()));
@@ -61,7 +57,8 @@ public class RoomController {
     @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllRooms() {
-        return Response.ok().entity(restRoomAdapter.getAllRooms()).build();
+        return Response.ok().entity(restRoomAdapter.getAllRooms().stream()
+                .map(RestMapper::roomToRoomDto).toList()).build();
     }
 
     @GET
@@ -70,9 +67,7 @@ public class RoomController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getRoom(@PathParam("roomNumber") int roomNumber) {
         try {
-            Room room = restRoomAdapter.getRoom(roomNumber);
-            RoomDto roomDto = new RoomDto(roomNumber, room.getCapacity(), room.getPrice(), room.getEquipmentType());
-            return Response.ok().entity(roomDto).build();
+            return Response.ok().entity(RestMapper.roomToRoomDto(restRoomAdapter.getRoom(roomNumber))).build();
         } catch (NoSuchElementException e) {
             log.warning("Room %s does not exist. ".formatted(roomNumber));
             return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();

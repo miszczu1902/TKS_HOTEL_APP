@@ -10,6 +10,7 @@ import domain.exceptions.UserException;
 import domain.model.Reservation;
 import domain.model.Role;
 import domain.model.user.User;
+import mapper.RestMapper;
 import org.jetbrains.annotations.NotNull;
 import rest.auth.JwsGenerator;
 import rest.dto.*;
@@ -131,17 +132,7 @@ public class UserController {
     @RolesAllowed("GUEST")
     public Response addUser(@Valid CreateUserDto user) {
         try {
-            restUserAdapter.addUser(new User(
-                    user.getUsername(),
-                    user.getPassword(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    Role.USER,
-                    true,
-                    user.getCity(),
-                    user.getStreet(),
-                    user.getStreetNumber(),
-                    user.getPostalCode()));
+            restUserAdapter.addUser(RestMapper.createUserDtoToUser(user));
             return Response.created(URI.create("/users/%s".formatted(user.getUsername()))).build();
         } catch (UserException e) {
             return Response.status(Response.Status.CONFLICT.getStatusCode()).build();
@@ -244,10 +235,10 @@ public class UserController {
             User user = restUserAdapter.getUser(username);
             List<Reservation> reservation = restReservationAdapter.getReservationsForClient(username);
             List<ReservationForUsersDto> reservations = reservation.stream().
-                    map(reservation1 -> new ReservationForUsersDto(
-                            reservation1.getRoom().getRoomNumber(),
-                            reservation1.getBeginTime(),
-                            reservation1.getEndTime()))
+                    map(resForUser -> new ReservationForUsersDto(
+                            resForUser.getRoom().getRoomNumber(),
+                            resForUser.getBeginTime(),
+                            resForUser.getEndTime()))
                     .collect(Collectors.toList());
             UserWithReservationsDto userWithReservationsDto =
                     new UserWithReservationsDto(user.getUsername(), user.getFirstName(), user.getLastName(),

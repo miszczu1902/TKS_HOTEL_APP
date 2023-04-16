@@ -18,6 +18,7 @@ import java.util.List;
 public final class ReservationControllerTest extends AbstractControllerTest {
 
     private static final List<RoomWithReservationDto> roomsWithReservations = new ArrayList<>();
+    private static final List<RoomWithReservationDto> roomsWithoutReservations = new ArrayList<>();
 
     @Before
     public void prepareDataToTest() {
@@ -27,14 +28,15 @@ public final class ReservationControllerTest extends AbstractControllerTest {
 
         if (!roomsNumbers.isEmpty()) {
             roomsNumbers.forEach(roomNumber -> {
-                RoomWithReservationDto roomWithReservation = sendRequestAndGetResponse(
+                RoomWithReservationDto room = sendRequestAndGetResponse(
                         Method.GET,
                         "/rooms/" + roomNumber + "/reservations",
                         null,
                         null)
                         .body().as(RoomWithReservationDto.class);
 
-                if (!roomWithReservation.getReservations().isEmpty()) roomsWithReservations.add(roomWithReservation);
+                if (!room.getReservations().isEmpty()) roomsWithReservations.add(room);
+                else roomsWithoutReservations.add(room);
             });
 
             if (roomsWithReservations.isEmpty()) {
@@ -108,9 +110,17 @@ public final class ReservationControllerTest extends AbstractControllerTest {
     }
 
     private Integer getRandomNumberOfRoomWhichCouldBeReserved() {
-        Collections.shuffle(roomsWithReservations);
-        return roomsWithReservations.stream()
-                .filter(room -> !room.getReservations().isEmpty())
-                .toList().get(0).getRoomNumber();
+        if(!roomsWithoutReservations.isEmpty()) {
+            Collections.shuffle(roomsWithoutReservations);
+            return roomsWithoutReservations.stream()
+                    .map(RoomWithReservationDto::getRoomNumber)
+                    .toList().get(0);
+        } else {
+            Collections.shuffle(roomsWithReservations);
+            return roomsWithReservations.stream()
+                    .filter(room -> !room.getReservations().isEmpty())
+                    .toList().get(0).getRoomNumber();
+        }
+
     }
 }

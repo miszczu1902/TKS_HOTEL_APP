@@ -16,7 +16,6 @@
         <module>ApplicationServicePorts</module>
         <module>RestAdapter</module>
         <module>SoapAdapter</module>
-        <module>ApplicationSoapPorts</module>
     </modules>
 
     <dependencyManagement>
