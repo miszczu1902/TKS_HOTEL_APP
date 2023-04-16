@@ -53,17 +53,17 @@ public class SoapMapperTest {
                 true
         );
 
-        User userXD = SoapMapper.userSoapToUser(user);
+        User mappedUser = SoapMapper.userSoapToUser(user);
 
-        assertEquals(user.getUsername(), userXD.getUsername());
-        assertEquals(user.getFirstName(), userXD.getFirstName());
-        assertEquals(user.getLastName(), userXD.getLastName());
-        assertEquals(user.getCity(), userXD.getCity());
-        assertEquals(user.getStreet(), userXD.getStreet());
-        assertEquals(user.getStreetNumber(), userXD.getStreetNumber());
-        assertEquals(user.getPostalCode(), userXD.getPostalCode());
-        assertEquals(user.getRole(), userXD.getRole().toString());
-        assertEquals(user.getIsActive(), userXD.getIsActive());
+        assertEquals(user.getUsername(), mappedUser.getUsername());
+        assertEquals(user.getFirstName(), mappedUser.getFirstName());
+        assertEquals(user.getLastName(), mappedUser.getLastName());
+        assertEquals(user.getCity(), mappedUser.getCity());
+        assertEquals(user.getStreet(), mappedUser.getStreet());
+        assertEquals(user.getStreetNumber(), mappedUser.getStreetNumber());
+        assertEquals(user.getPostalCode(), mappedUser.getPostalCode());
+        assertEquals(user.getRole(), mappedUser.getRole().toString());
+        assertEquals(user.getIsActive(), mappedUser.getIsActive());
     }
 
 }

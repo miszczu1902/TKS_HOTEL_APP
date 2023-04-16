@@ -78,5 +78,4 @@ public class UserSoap {
         this.postalCode = postalCode;
     }
 
-
 }
