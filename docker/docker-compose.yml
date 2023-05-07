@@ -1,21 +1,22 @@
-version: '3.8'
+version: '3.9'
 
 services:
   payara:
-    image: payara/server-full:5.2022.3
-    restart: always
+    image: payara/server-full:5.2022.3-jdk17
     ports:
       - "8080:8080"
       - "4848:4848"
-      - "8443:8443"
-    volumes:
-      - ./deployments:/opt/payara/deployments
+      - "9009:9009"
+    extra_hosts:
+      - "database:172.55.0.3"
+    networks:
+      tks:
+        ipv4_address: 172.55.0.2
     environment:
-      - POSTGRES_USER=nbd
-      - POSTGRES_PASSWORD=nbdpassword
-      - POSTGRES_HOST=nbddb
-    depends_on:
-      - db
+      - JVM_ARGS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:9009
+    volumes:
+      - ../RestAdapter/target/RestAdapter-1.0-SNAPSHOT.war:/opt/payara/deployments/RestAdapter-1.0-SNAPSHOT.war
+
   db:
     image: postgres
     restart: always
@@ -25,8 +26,13 @@ services:
       POSTGRES_PASSWORD: nbdpassword
     ports:
       - "5432:5432"
-    volumes:
-      - pg:/var/lib/postgresql/data
-volumes:
-  pg:
-  deployments:
+    networks:
+      tks:
+        ipv4_address: 172.55.0.3
+
+networks:
+  tks:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.55.0.0/24

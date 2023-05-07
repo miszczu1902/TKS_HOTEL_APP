@@ -13,11 +13,12 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.Setter;
 import org.junit.BeforeClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rest.dto.GetUserDto;
 import rest.dto.LoginDto;
 
 import java.util.Optional;
-import java.util.logging.Logger;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.given;
@@ -34,7 +35,7 @@ public abstract sealed class AbstractControllerTest permits ReservationControlle
     protected static final LoginDto userData = new LoginDto("miszczu", "123456");
 
     protected static GetUserDto user;
-    protected static Logger logger = Logger.getLogger(AbstractControllerTest.class.getName());
+    protected static Logger logger = LoggerFactory.getLogger("testcontainers-config");
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeClass
