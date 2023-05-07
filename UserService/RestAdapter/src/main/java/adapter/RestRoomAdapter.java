@@ -1,9 +1,6 @@
 package adapter;
 
-import domain.exceptions.RoomException;
 import domain.model.room.Room;
-import service.port.control.RoomControlServicePort;
-import service.port.infrasturcture.RoomInfServicePort;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

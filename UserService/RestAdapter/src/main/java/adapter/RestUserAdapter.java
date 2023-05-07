@@ -2,7 +2,7 @@ package adapter;
 
 import domain.exceptions.JwsException;
 import domain.exceptions.UserException;
-import domain.model.user.User;
+import domain.model.User;
 import service.port.control.UserControlServicePort;
 import service.port.infrasturcture.UserInfServicePort;
 

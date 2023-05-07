@@ -1,6 +1,6 @@
 package soap.port.infrastructure;
 
-import domain.model.user.User;
+import domain.model.User;
 
 import java.util.List;
 

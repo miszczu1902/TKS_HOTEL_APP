@@ -1,7 +1,7 @@
 package rest.auth;
 
 import adapter.RestUserAdapter;
-import domain.model.user.User;
+import domain.model.User;
 
 import javax.inject.Inject;
 import javax.security.enterprise.SecurityContext;

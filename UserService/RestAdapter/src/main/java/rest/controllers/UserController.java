@@ -1,19 +1,19 @@
 package rest.controllers;
 
-import adapter.RestReservationAdapter;
 import adapter.RestUserAdapter;
 import com.nimbusds.jose.JOSEException;
 import domain.exceptions.ChangePasswordException;
 import domain.exceptions.JwsException;
-import domain.exceptions.ReservationException;
 import domain.exceptions.UserException;
-import domain.model.Reservation;
 import domain.model.Role;
-import domain.model.user.User;
+import domain.model.User;
 import mapper.RestMapper;
 import org.jetbrains.annotations.NotNull;
 import rest.auth.JwsGenerator;
-import rest.dto.*;
+import rest.dto.ChangePasswordDto;
+import rest.dto.CreateUserDto;
+import rest.dto.GetUserDto;
+import rest.dto.UpdateUserDto;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -31,16 +31,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 @Path("/users")
 public class UserController {
 
     @Inject
     private RestUserAdapter restUserAdapter;
-
-    @Inject
-    private RestReservationAdapter restReservationAdapter;
 
     @Inject
     private SecurityContext securityContext;
@@ -200,22 +196,6 @@ public class UserController {
         }
     }
 
-    @GET
-    @Path("/{username}/reservations")
-    @RolesAllowed({"ADMIN", "MODERATOR"})
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getClientWithReservations(@PathParam("username") String username) {
-        return getInfoClientWithReservations(username);
-    }
-
-    @GET
-    @Path("/reservations")
-    @RolesAllowed({"USER"})
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getClientWithReservations() {
-        return getInfoClientWithReservations(securityContext.getCallerPrincipal().getName());
-    }
-
     @PATCH
     @RolesAllowed({"ADMIN", "MODERATOR", "USER"})
     @Path("/updatePassword")
@@ -227,30 +207,6 @@ public class UserController {
             return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
         } catch (ChangePasswordException | ValidationException e) {
             return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
-        }
-    }
-
-    private Response getInfoClientWithReservations(String username) {
-        try {
-            User user = restUserAdapter.getUser(username);
-            List<Reservation> reservation = restReservationAdapter.getReservationsForClient(username);
-            List<ReservationForUsersDto> reservations = reservation.stream().
-                    map(resForUser -> new ReservationForUsersDto(
-                            resForUser.getRoom().getRoomNumber(),
-                            resForUser.getBeginTime(),
-                            resForUser.getEndTime()))
-                    .collect(Collectors.toList());
-            UserWithReservationsDto userWithReservationsDto =
-                    new UserWithReservationsDto(user.getUsername(), user.getFirstName(), user.getLastName(),
-                            user.getRole(), user.getIsActive(), user.getCity(), user.getStreet(),
-                            user.getStreetNumber(), user.getPostalCode(), reservations);
-            return Response.ok().entity(userWithReservationsDto).build();
-        } catch (NoSuchElementException e) {
-            log.warning("Client %s does not exist.".formatted(username));
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
-        } catch (ReservationException e) {
-            log.warning("Not found reservations for client %s".formatted(username));
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
         }
     }
 

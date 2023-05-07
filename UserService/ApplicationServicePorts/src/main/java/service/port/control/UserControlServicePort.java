@@ -2,7 +2,7 @@ package service.port.control;
 
 import domain.exceptions.JwsException;
 import domain.exceptions.UserException;
-import domain.model.user.User;
+import domain.model.User;
 
 public interface UserControlServicePort {
 

@@ -25,7 +25,7 @@ import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public abstract sealed class AbstractControllerTest permits ReservationControllerTest, RoomControllerTest, UserControllerTest {
+public abstract sealed class AbstractControllerTest permits UserControllerTest {
 
     @Setter
     protected static String bearerToken = "";

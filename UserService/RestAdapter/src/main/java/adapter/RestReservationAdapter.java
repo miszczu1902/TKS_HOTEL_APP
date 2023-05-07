@@ -1,10 +1,7 @@
 package adapter;
 
 import domain.exceptions.LogicException;
-import domain.exceptions.ReservationException;
 import domain.model.Reservation;
-import service.port.control.ReservationControlServicePort;
-import service.port.infrasturcture.ReservationInfServicePort;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

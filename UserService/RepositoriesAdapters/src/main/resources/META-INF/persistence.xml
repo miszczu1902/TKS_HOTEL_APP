@@ -7,9 +7,7 @@
     <persistence-unit name="TEST_HOTEL" transaction-type="JTA">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <jta-data-source>java:app/jdbc/TEST_HOTEL</jta-data-source>
-        <class>adapter.model.user.UserEnt</class>
-        <class>adapter.model.ReservationEnt</class>
-        <class>adapter.model.room.RoomEnt</class>
+        <class>adapter.model.UserEnt</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL10Dialect"/>

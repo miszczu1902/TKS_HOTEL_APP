@@ -1,7 +1,7 @@
 package rest.controllers;
 
 import domain.model.Role;
-import domain.model.user.User;
+import domain.model.User;
 import io.restassured.http.ContentType;
 import io.restassured.http.Method;
 import io.restassured.response.Response;

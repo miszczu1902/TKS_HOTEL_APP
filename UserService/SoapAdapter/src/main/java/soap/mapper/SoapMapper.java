@@ -1,7 +1,7 @@
 package soap.mapper;
 
 import domain.model.Role;
-import domain.model.user.User;
+import domain.model.User;
 import soap.model.UserSoap;
 
 public class SoapMapper {

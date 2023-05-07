@@ -1,6 +1,6 @@
 package service.port.infrasturcture;
 
-import domain.model.user.User;
+import domain.model.User;
 
 import java.util.List;
 

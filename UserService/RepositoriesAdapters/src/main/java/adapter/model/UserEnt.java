@@ -1,4 +1,4 @@
-package adapter.model.user;
+package adapter.model;
 
 import adapter.model.RoleEnt;
 import lombok.*;

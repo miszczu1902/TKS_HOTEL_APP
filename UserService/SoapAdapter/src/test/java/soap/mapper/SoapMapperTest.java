@@ -1,7 +1,7 @@
 package soap.mapper;
 
 import domain.model.Role;
-import domain.model.user.User;
+import domain.model.User;
 import org.junit.Test;
 import org.testcontainers.shaded.org.apache.commons.lang.RandomStringUtils;
 import soap.model.UserSoap;

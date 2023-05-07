@@ -1,6 +1,5 @@
-package domain.model.user;
+package domain.model;
 
-import domain.model.Role;
 import lombok.*;
 
 import java.io.Serializable;
