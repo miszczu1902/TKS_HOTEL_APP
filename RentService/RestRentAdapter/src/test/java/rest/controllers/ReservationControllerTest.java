@@ -15,22 +15,21 @@ import java.util.Collections;
 import java.util.List;
 
 
-public final class ReservationControllerTest extends AbstractControllerTest {
+public class ReservationControllerTest extends AbstractControllerTest {
 
     private static final List<RoomWithReservationDto> roomsWithReservations = new ArrayList<>();
     private static final List<RoomWithReservationDto> roomsWithoutReservations = new ArrayList<>();
 
     @Before
     public void prepareDataToTest() {
-        auth(adminData);
-        List<Integer> roomsNumbers = sendRequestAndGetResponse(Method.GET, "/rooms", null, null)
+        List<Integer> roomsNumbers = sendRequestAndGetResponse(Method.GET, "/rent/rooms", null, null)
                 .body().jsonPath().getList("roomNumber", Integer.class);
 
         if (!roomsNumbers.isEmpty()) {
             roomsNumbers.forEach(roomNumber -> {
                 RoomWithReservationDto room = sendRequestAndGetResponse(
                         Method.GET,
-                        "/rooms/" + roomNumber + "/reservations",
+                        "/rent/rooms/" + roomNumber + "/reservations",
                         null,
                         null)
                         .body().as(RoomWithReservationDto.class);
@@ -43,7 +42,7 @@ public final class ReservationControllerTest extends AbstractControllerTest {
                 RoomDto room = HotelObjectsFactory.createRoomToAdd();
                 sendRequestAndGetResponse(
                         Method.POST,
-                        "/rooms",
+                        "/rent/rooms",
                         objectToJson(room),
                         ContentType.JSON);
 
@@ -53,13 +52,13 @@ public final class ReservationControllerTest extends AbstractControllerTest {
                         "miszczu");
                 sendRequestAndGetResponse(
                         Method.POST,
-                        "/reservations",
+                        "/rent/reservations",
                         objectToJson(reservationForClient),
                         ContentType.JSON);
 
                 Response roomWithReservations = sendRequestAndGetResponse(
                         Method.GET,
-                        "/rooms/" + room.getRoomNumber() + "/reservations",
+                        "/rent/rooms/" + room.getRoomNumber() + "/reservations",
                         null,
                         null);
 
@@ -71,29 +70,7 @@ public final class ReservationControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void createReservationForMyself() {
-        LoginDto userToLogin = new LoginDto("miszczu", "123456");
-        auth(userToLogin);
-
-        Integer roomNumberToReserve = getRandomNumberOfRoomWhichCouldBeReserved();
-        int daysToAdd = RandomUtils.nextInt();
-        LocalDate beginTime = roomsWithReservations.get(0).getReservations().get(0).getEndTime().plusDays(daysToAdd);
-        LocalDate endTime = roomsWithReservations.get(0).getReservations().get(0).getEndTime().plusDays(daysToAdd + 1);
-        ReservationSelfDto reservationForMyself = new ReservationSelfDto(roomNumberToReserve,
-                beginTime.toString(), endTime.toString());
-
-        Response response = sendRequestAndGetResponse(
-                Method.POST,
-                "/reservations/self",
-                objectToJson(reservationForMyself),
-                ContentType.JSON);
-        assertEqualsCustom(201, response.getStatusCode());
-    }
-
-    @Test
     public void createReservationForClient() {
-        auth(adminData);
-
         Integer roomNumberToReserve = getRandomNumberOfRoomWhichCouldBeReserved();
         int daysToAdd = RandomUtils.nextInt();
         LocalDate beginTime = roomsWithReservations.get(0).getReservations().get(0).getEndTime().plusDays(daysToAdd);
@@ -103,14 +80,14 @@ public final class ReservationControllerTest extends AbstractControllerTest {
 
         Response response = sendRequestAndGetResponse(
                 Method.POST,
-                "/reservations",
+                "/rent/reservations",
                 objectToJson(reservationForMyself),
                 ContentType.JSON);
         assertEqualsCustom(201, response.getStatusCode());
     }
 
     private Integer getRandomNumberOfRoomWhichCouldBeReserved() {
-        if(!roomsWithoutReservations.isEmpty()) {
+        if (!roomsWithoutReservations.isEmpty()) {
             Collections.shuffle(roomsWithoutReservations);
             return roomsWithoutReservations.stream()
                     .map(RoomWithReservationDto::getRoomNumber)
@@ -121,6 +98,5 @@ public final class ReservationControllerTest extends AbstractControllerTest {
                     .filter(room -> !room.getReservations().isEmpty())
                     .toList().get(0).getRoomNumber();
         }
-
     }
 }
