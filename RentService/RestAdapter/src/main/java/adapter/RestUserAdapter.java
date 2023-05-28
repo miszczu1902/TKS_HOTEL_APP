@@ -1,6 +1,5 @@
 package adapter;
 
-import domain.exceptions.JwsException;
 import domain.exceptions.UserException;
 import domain.model.user.User;
 import service.port.control.UserControlServicePort;
@@ -23,8 +22,8 @@ public class RestUserAdapter {
         userControlServicePort.addUser(user);
     }
 
-    public void updateUser(User user, String jws) throws UserException, JwsException {
-        userControlServicePort.updateUser(user, jws);
+    public void updateUser(User user) throws UserException {
+        userControlServicePort.updateUser(user);
     }
 
     public void activateUser(String username) throws UserException {

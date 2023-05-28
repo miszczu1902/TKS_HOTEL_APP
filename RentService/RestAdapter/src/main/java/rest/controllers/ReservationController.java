@@ -40,7 +40,7 @@ public class ReservationController {
     private SecurityContext securityContext;
 
     @POST
-    @RolesAllowed({"ADMIN", "MODERATOR"})
+//    @RolesAllowed({"ADMIN", "MODERATOR"})
     @Consumes(MediaType.APPLICATION_JSON)
     public Response reserveRoom(@Valid ReservationDto reservation) throws LogicException {
         try {
@@ -58,7 +58,7 @@ public class ReservationController {
     }
 
     @POST
-    @RolesAllowed({"USER"})
+//    @RolesAllowed({"USER"})
     @Path("/self")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response reserveRoomByClient(@Valid ReservationSelfDto reservation) throws LogicException {
@@ -78,7 +78,7 @@ public class ReservationController {
     }
 
     @POST
-    @RolesAllowed({"ADMIN", "MODERATOR"})
+//    @RolesAllowed({"ADMIN", "MODERATOR"})
     @Path("/{reservationId}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response endReserveRoom(@PathParam("reservationId") String reservationId) {
@@ -93,14 +93,14 @@ public class ReservationController {
     }
 
     @GET
-    @RolesAllowed({"ADMIN", "MODERATOR"})
+//    @RolesAllowed({"ADMIN", "MODERATOR"})
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllReservations() {
         return Response.ok().entity(restReservationAdapter.getAllReservations()).build();
     }
 
     @GET
-    @RolesAllowed({"ADMIN", "MODERATOR"})
+//    @RolesAllowed({"ADMIN", "MODERATOR"})
     @Path("/{reservationId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getReservationById(@PathParam("reservationId") String reservationId) {

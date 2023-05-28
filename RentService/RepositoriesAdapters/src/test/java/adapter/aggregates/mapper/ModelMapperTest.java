@@ -16,20 +16,12 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ModelMapperTest {
-
     @Test
     void reservationToReservationEnt() {
         String username = "Miszczak";
-        String password = "Miszczak69";
-        String firstName = "Bartosz";
-        String lastName = "Miszczak";
-        String city = "Brzeziny";
-        String street = "Brzezinska";
-        String streetNumber = "9";
-        String postalCode = "95-002";
 
         Room room = new Room(1, 34, 15., EquipmentType.BASIC);
-        User user = new User(username, password, firstName, lastName, city, street, streetNumber, postalCode);
+        User user = new User(username);
         Reservation reservation = new Reservation(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"), room, LocalDate.now(), LocalDate.now().plusDays(2),
                 user, 15, true);
         ReservationEnt reservationEnt = ModelMapper.reservationToReservationEnt(reservation);
@@ -40,13 +32,6 @@ class ModelMapperTest {
         RoomEnt roomEnt = reservationEnt.getRoom();
         UserEnt userEnt = reservationEnt.getUser();
         assertEquals(user.getUsername(), userEnt.getUsername());
-        assertEquals(user.getPassword(), userEnt.getPassword());
-        assertEquals(user.getFirstName(), userEnt.getFirstName());
-        assertEquals(user.getLastName(), userEnt.getLastName());
-        assertEquals(user.getCity(), userEnt.getCity());
-        assertEquals(user.getStreet(), userEnt.getStreet());
-        assertEquals(user.getStreetNumber(), userEnt.getStreetNumber());
-        assertEquals(user.getPostalCode(), userEnt.getPostalCode());
         assertEquals(room.getRoomNumber(), roomEnt.getRoomNumber());
         assertEquals(room.getCapacity(), roomEnt.getCapacity());
         assertEquals(room.getPrice(), roomEnt.getPrice());
@@ -55,7 +40,7 @@ class ModelMapperTest {
 
     @Test
     void reservationEntToReservation() {
-        UserEnt userEnt = new UserEnt("BartoszMiszczak", "123456", "Bartosz", "Miszczak", "Brzeziny", "Wolska", "12", "92-015");
+        UserEnt userEnt = new UserEnt("BartoszMiszczak");
         RoomEnt roomEnt = new RoomEnt(1, 10, 10.5, EquipmentTypeEnt.BASIC);
 
         ReservationEnt reservationEnt = new ReservationEnt(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"), roomEnt, LocalDate.now(), LocalDate.now().plusDays(2),
@@ -68,13 +53,6 @@ class ModelMapperTest {
         Room room = reservation.getRoom();
         User user = reservation.getUser();
         assertEquals(user.getUsername(), userEnt.getUsername());
-        assertEquals(user.getPassword(), userEnt.getPassword());
-        assertEquals(user.getFirstName(), userEnt.getFirstName());
-        assertEquals(user.getLastName(), userEnt.getLastName());
-        assertEquals(user.getCity(), userEnt.getCity());
-        assertEquals(user.getStreet(), userEnt.getStreet());
-        assertEquals(user.getStreetNumber(), userEnt.getStreetNumber());
-        assertEquals(user.getPostalCode(), userEnt.getPostalCode());
         assertEquals(room.getRoomNumber(), roomEnt.getRoomNumber());
         assertEquals(room.getCapacity(), roomEnt.getCapacity());
         assertEquals(room.getPrice(), roomEnt.getPrice());
@@ -83,33 +61,15 @@ class ModelMapperTest {
 
     @Test
     void userToUserEnt() {
-
-        User user = new User("BartoszMiszczak", "123456", "Bartosz", "Miszczak", "Brzeziny", "Wolska", "12", "92-015");
+        User user = new User("BartoszMiszczak");
         UserEnt userEnt = ModelMapper.userToUserEnt(user);
-
         assertEquals(user.getUsername(), userEnt.getUsername());
-        assertEquals(user.getPassword(), userEnt.getPassword());
-        assertEquals(user.getFirstName(), userEnt.getFirstName());
-        assertEquals(user.getLastName(), userEnt.getLastName());
-        assertEquals(user.getCity(), userEnt.getCity());
-        assertEquals(user.getStreet(), userEnt.getStreet());
-        assertEquals(user.getStreetNumber(), userEnt.getStreetNumber());
-        assertEquals(user.getPostalCode(), userEnt.getPostalCode());
     }
 
     @Test
     void userEntToUser() {
-        UserEnt userEnt = new UserEnt("BartoszMiszczak", "123456", "Bartosz", "Miszczak", "Brzeziny", "Wolska", "12", "92-015");
+        UserEnt userEnt = new UserEnt("BartoszMiszczak");
         User user = ModelMapper.userEntToUser(userEnt);
-        assertEquals(userEnt.getUsername(), user.getUsername());
-        assertEquals(userEnt.getPassword(), user.getPassword());
-        assertEquals(userEnt.getFirstName(), user.getFirstName());
-        assertEquals(userEnt.getLastName(), user.getLastName());
-        assertEquals(userEnt.getCity(), user.getCity());
-        assertEquals(userEnt.getStreet(), user.getStreet());
-        assertEquals(userEnt.getStreetNumber(), user.getStreetNumber());
-        assertEquals(userEnt.getPostalCode(), user.getPostalCode());
-
     }
 
     @Test
@@ -133,6 +93,4 @@ class ModelMapperTest {
         assertEquals(roomEnt.getPrice(), room.getPrice());
         assertEquals(roomEnt.getEquipmentTypeEnt().toString(), room.getEquipmentType().toString());
     }
-
-
 }

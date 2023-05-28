@@ -58,7 +58,7 @@ public class ReservationService implements ReservationInfServicePort, Reservatio
             Room room = roomInfPort.get(roomNumber);
             String username = reservation.getUser().getUsername();
 
-            if (userInfPort.get(username).getIsActive()) {
+            if (userInfPort.get(username) != null) {
                 LocalDate beginTime = LocalDate.parse(reservation.getBeginTime().toString());
                 LocalDate endTime = LocalDate.parse(reservation.getEndTime().toString());
                 LocalDate now = LocalDate.now();

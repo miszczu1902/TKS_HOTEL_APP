@@ -1,6 +1,5 @@
 package rest.mapper;
 
-import domain.model.Role;
 import domain.model.room.EquipmentType;
 import domain.model.room.Room;
 import domain.model.user.User;
@@ -38,18 +37,9 @@ class RestMapperTest {
 
     @Test
     void createUserDtoToUser() {
-        CreateUserDto createUserDto = new CreateUserDto("john_doe", "pass123", "John", "Doe", "New York", "Main Street", "10", "12-345");
+        CreateUserDto createUserDto = new CreateUserDto("john_doe");
         User user = RestMapper.createUserDtoToUser(createUserDto);
 
         assertEquals("john_doe", user.getUsername());
-        assertEquals("pass123", user.getPassword());
-        assertEquals("John", user.getFirstName());
-        assertEquals("Doe", user.getLastName());
-        assertEquals(Role.USER, user.getRole());
-        assertEquals(true, user.getIsActive());
-        assertEquals("New York", user.getCity());
-        assertEquals("Main Street", user.getStreet());
-        assertEquals("10", user.getStreetNumber());
-        assertEquals("12-345", user.getPostalCode());
     }
 }

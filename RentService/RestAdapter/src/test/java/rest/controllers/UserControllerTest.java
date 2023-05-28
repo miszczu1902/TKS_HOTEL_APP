@@ -1,6 +1,5 @@
 package rest.controllers;
 
-import domain.model.Role;
 import domain.model.user.User;
 import io.restassured.http.ContentType;
 import io.restassured.http.Method;
@@ -30,12 +29,6 @@ public final class UserControllerTest extends AbstractControllerTest {
 
             User userData = responseBody.getBody().as(User.class);
             assertEqualsCustom(user.getUsername(), userData.getUsername());
-            assertEqualsCustom(user.getFirstName(), userData.getFirstName());
-            assertEqualsCustom(user.getLastName(), userData.getLastName());
-            assertEqualsCustom(user.getCity(), userData.getCity());
-            assertEqualsCustom(user.getStreet(), userData.getStreet());
-            assertEqualsCustom(user.getPostalCode(), userData.getPostalCode());
-            assertEqualsCustom(Role.valueOf(user.getRole()), userData.getRole());
 
         });
     }
@@ -53,11 +46,6 @@ public final class UserControllerTest extends AbstractControllerTest {
                 .body().as(GetUserDto.class);
 
         assertEqualsCustom(user.getUsername(), userData.getUsername());
-        assertEqualsCustom(user.getFirstName(), userData.getFirstName());
-        assertEqualsCustom(user.getLastName(), userData.getLastName());
-        assertEqualsCustom(user.getCity(), userData.getCity());
-        assertEqualsCustom(user.getStreet(), userData.getStreet());
-        assertEqualsCustom(user.getPostalCode(), userData.getPostalCode());
 
     }
 

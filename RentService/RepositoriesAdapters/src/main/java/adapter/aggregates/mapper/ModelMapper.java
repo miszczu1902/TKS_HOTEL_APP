@@ -6,7 +6,6 @@ import adapter.model.room.EquipmentTypeEnt;
 import adapter.model.room.RoomEnt;
 import adapter.model.user.UserEnt;
 import domain.model.Reservation;
-import domain.model.Role;
 import domain.model.room.EquipmentType;
 import domain.model.room.Room;
 import domain.model.user.User;
@@ -24,8 +23,7 @@ public class ModelMapper {
                     new RoomEnt(room.getRoomNumber(), room.getCapacity(), room.getPrice(), EquipmentTypeEnt.valueOf(room.getEquipmentType().toString())),
                     reservation.getBeginTime(),
                     reservation.getEndTime(),
-                    new UserEnt(user.getUsername(), user.getPassword(), user.getFirstName(), user.getLastName(),
-                            user.getCity(), user.getStreet(), user.getStreetNumber(), user.getPostalCode()),
+                    new UserEnt(user.getUsername()),
                     reservation.getReservationCost(),
                     reservation.isActive());
         } catch (NullPointerException e) {
@@ -42,8 +40,7 @@ public class ModelMapper {
                     new Room(room.getRoomNumber(), room.getCapacity(), room.getPrice(), EquipmentType.valueOf(room.getEquipmentTypeEnt().toString())),
                     reservationEnt.getBeginTime(),
                     reservationEnt.getEndTime(),
-                    new User(user.getUsername(), user.getPassword(), user.getFirstName(), user.getLastName(),
-                            user.getCity(), user.getStreet(), user.getStreetNumber(), user.getPostalCode()),
+                    new User(user.getUsername()),
                     reservationEnt.getReservationCost(),
                     reservationEnt.isActive());
         } catch (NullPointerException e) {
@@ -53,9 +50,7 @@ public class ModelMapper {
 
     public static UserEnt userToUserEnt(User user) {
         try {
-            return new UserEnt(user.getUsername(), user.getPassword(), user.getFirstName(), user.getLastName(),
-                    RoleEnt.valueOf(user.getRole().toString()), user.getIsActive(),
-                    user.getCity(), user.getStreet(), user.getStreetNumber(), user.getPostalCode());
+            return new UserEnt(user.getUsername());
         } catch (NullPointerException e) {
             throw new NoSuchElementException(e);
         }
@@ -63,9 +58,7 @@ public class ModelMapper {
 
     public static User userEntToUser(UserEnt userEnt) {
         try {
-            return new User(userEnt.getUsername(), userEnt.getPassword(), userEnt.getFirstName(), userEnt.getLastName(),
-                    Role.valueOf(userEnt.getRole().toString()), userEnt.getIsActive(),
-                    userEnt.getCity(), userEnt.getStreet(), userEnt.getStreetNumber(), userEnt.getPostalCode());
+            return new User(userEnt.getUsername());
         } catch (NullPointerException e) {
             throw new NoSuchElementException(e);
         }

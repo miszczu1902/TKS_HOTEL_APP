@@ -3,16 +3,13 @@ package rest.controllers;
 import adapter.RestReservationAdapter;
 import adapter.RestUserAdapter;
 import com.nimbusds.jose.JOSEException;
-import domain.exceptions.ChangePasswordException;
-import domain.exceptions.JwsException;
 import domain.exceptions.ReservationException;
 import domain.exceptions.UserException;
 import domain.model.Reservation;
-import domain.model.Role;
 import domain.model.user.User;
 import mapper.RestMapper;
 import org.jetbrains.annotations.NotNull;
-import rest.auth.JwsGenerator;
+//import rest.auth.JwsGenerator;
 import rest.dto.*;
 
 import javax.annotation.security.PermitAll;
@@ -45,36 +42,15 @@ public class UserController {
     @Inject
     private SecurityContext securityContext;
 
-    @Inject
-    private JwsGenerator jwsGenerator;
 
     private final Logger log = Logger.getLogger(getClass().getName());
 
     @GET
-    @PermitAll
-    @Path("/{username}/jws")
-    public Response getJws(@PathParam("username") String username) {
-        try {
-            String jws = getJwsForUser(username);
-            return Response.noContent().header("ETag", jws).build();
-        } catch (UserException e) {
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
-        } catch (JOSEException e) {
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
-        }
-    }
-
-    @GET
-    @RolesAllowed({"ADMIN", "MODERATOR"})
+//    @RolesAllowed({"ADMIN", "MODERATOR"})
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers() {
         List<GetUserDto> users = restUserAdapter.getAllUsers().stream()
-                .map(user -> new GetUserDto(user.getUsername(), user.getFirstName(), user.getLastName(),
-                        Optional.ofNullable(user.getCity()).orElse(""),
-                        Optional.ofNullable(user.getStreet()).orElse(""),
-                        Optional.ofNullable(user.getStreetNumber()).orElse(""),
-                        Optional.ofNullable(user.getPostalCode()).orElse(""),
-                        user.getRole().toString(), user.getIsActive()))
+                .map(user -> new GetUserDto(user.getUsername()))
                 .toList();
         return Response.ok().entity(users).build();
     }
@@ -82,28 +58,21 @@ public class UserController {
     @GET
     @Path("/clients")
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"ADMIN", "MODERATOR"})
+//    @RolesAllowed({"ADMIN", "MODERATOR"})
     public Response getAllClients() {
         List<GetUserDto> users = restUserAdapter.getAllClients().stream()
-                .map(user -> new GetUserDto(user.getUsername(), user.getFirstName(), user.getLastName(), user.getCity(),
-                        user.getStreet(), user.getStreetNumber(), user.getPostalCode(), user.getRole().toString(), user.getIsActive())).toList();
+                .map(user -> new GetUserDto(user.getUsername())).toList();
         return Response.ok().entity(users).build();
     }
 
     @GET
     @Path("/user")
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"ADMIN", "MODERATOR"})
+//    @RolesAllowed({"ADMIN", "MODERATOR"})
     public Response getUsersByUsername(@QueryParam("username") String pattern) {
         try {
             List<GetUserDto> users = restUserAdapter.getUsersByUsername(pattern).stream()
-                    .map(user -> new GetUserDto(user.getUsername(), user.getFirstName(), user.getLastName(),
-                            Optional.ofNullable(user.getCity()).orElse(""),
-                            Optional.ofNullable(user.getStreet()).orElse(""),
-                            Optional.ofNullable(user.getStreetNumber()).orElse(""),
-                            Optional.ofNullable(user.getPostalCode()).orElse(""),
-                            user.getRole().toString(),
-                            user.getIsActive())).toList();
+                    .map(user -> new GetUserDto(user.getUsername())).toList();
             return Response.ok().entity(users).build();
         } catch (NoSuchElementException e) {
             return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
@@ -113,13 +82,11 @@ public class UserController {
     @GET
     @Path("/{username}")
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"ADMIN", "MODERATOR", "USER"})
+//    @RolesAllowed({"ADMIN", "MODERATOR", "USER"})
     public Response getUser(@PathParam("username") String username) {
         try {
             User user = restUserAdapter.getUser(username);
-            return Response.ok().entity(new GetUserDto(user.getUsername(), user.getFirstName(), user.getLastName(),
-                    user.getCity(), user.getStreet(), user.getStreetNumber(), user.getPostalCode(), user.getRole().toString(),
-                    user.getIsActive())).build();
+            return Response.ok().entity(new GetUserDto(user.getUsername())).build();
         } catch (NoSuchElementException e) {
             String message = "Client %s does not exist.".formatted(username);
             log.warning(message);
@@ -129,7 +96,7 @@ public class UserController {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @RolesAllowed("GUEST")
+//    @RolesAllowed("GUEST")
     public Response addUser(@Valid CreateUserDto user) {
         try {
             restUserAdapter.addUser(RestMapper.createUserDtoToUser(user));
@@ -144,7 +111,7 @@ public class UserController {
     }
 
     @PUT
-    @RolesAllowed({"ADMIN", "MODERATOR", "USER"})
+//    @RolesAllowed({"ADMIN", "MODERATOR", "USER"})
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateUser(@Valid UpdateUserDto client, @Context HttpServletRequest request) {
         try {
@@ -155,26 +122,19 @@ public class UserController {
 
             User user = restUserAdapter.getUser(client.getUsername());
             user.setUsername(client.getUsername());
-            user.setFirstName(client.getFirstName());
-            user.setLastName(client.getLastName());
-            user.setCity(client.getCity());
-            user.setStreet(client.getStreet());
-            user.setStreetNumber(client.getStreetNumber());
-            user.setPostalCode(client.getPostalCode());
-            user.setRole(Role.valueOf(client.getRole()));
-            restUserAdapter.updateUser(user, jws);
+            restUserAdapter.updateUser(user);
 
             return Response.status(Response.Status.NO_CONTENT).build();
         } catch (UserException e) {
             return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
-        } catch (BadRequestException | JwsException | IllegalArgumentException e) {
+        } catch (BadRequestException | IllegalArgumentException e) {
             return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
         }
     }
 
     @POST
     @Path("/{username}/activate")
-    @RolesAllowed({"ADMIN"})
+//    @RolesAllowed({"ADMIN"})
     @Produces(MediaType.APPLICATION_JSON)
     public Response activateUser(@PathParam("username") String username) {
         try {
@@ -187,7 +147,7 @@ public class UserController {
     }
 
     @POST
-    @RolesAllowed({"ADMIN"})
+//    @RolesAllowed({"ADMIN"})
     @Path("/{username}/deactivate")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deactivateUser(@PathParam("username") String username) {
@@ -202,7 +162,7 @@ public class UserController {
 
     @GET
     @Path("/{username}/reservations")
-    @RolesAllowed({"ADMIN", "MODERATOR"})
+//    @RolesAllowed({"ADMIN", "MODERATOR"})
     @Produces(MediaType.APPLICATION_JSON)
     public Response getClientWithReservations(@PathParam("username") String username) {
         return getInfoClientWithReservations(username);
@@ -210,24 +170,10 @@ public class UserController {
 
     @GET
     @Path("/reservations")
-    @RolesAllowed({"USER"})
+//    @RolesAllowed({"USER"})
     @Produces(MediaType.APPLICATION_JSON)
     public Response getClientWithReservations() {
         return getInfoClientWithReservations(securityContext.getCallerPrincipal().getName());
-    }
-
-    @PATCH
-    @RolesAllowed({"ADMIN", "MODERATOR", "USER"})
-    @Path("/updatePassword")
-    public Response changeUserPassword(@Valid @NotNull ChangePasswordDto passwordDto) {
-        try {
-            changePassword(passwordDto.getOldPassword(), passwordDto.getNewPassword());
-            return Response.ok().build();
-        } catch (UserException e) {
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
-        } catch (ChangePasswordException | ValidationException e) {
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
-        }
     }
 
     private Response getInfoClientWithReservations(String username) {
@@ -241,9 +187,7 @@ public class UserController {
                             resForUser.getEndTime()))
                     .collect(Collectors.toList());
             UserWithReservationsDto userWithReservationsDto =
-                    new UserWithReservationsDto(user.getUsername(), user.getFirstName(), user.getLastName(),
-                            user.getRole(), user.getIsActive(), user.getCity(), user.getStreet(),
-                            user.getStreetNumber(), user.getPostalCode(), reservations);
+                    new UserWithReservationsDto(user.getUsername(), reservations);
             return Response.ok().entity(userWithReservationsDto).build();
         } catch (NoSuchElementException e) {
             log.warning("Client %s does not exist.".formatted(username));
@@ -251,33 +195,6 @@ public class UserController {
         } catch (ReservationException e) {
             log.warning("Not found reservations for client %s".formatted(username));
             return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
-        }
-    }
-
-    private String getJwsForUser(String username) throws UserException, JOSEException {
-        try {
-            User user = restUserAdapter.getUser(username);
-            return jwsGenerator.generateJws(user.getUsername());
-        } catch (NoSuchElementException e) {
-            log.warning("Client %s does not exist".formatted(username));
-            throw new UserException("Client %s does not exist".formatted(username));
-        }
-    }
-
-    private void changePassword(String oldPassword, String newPassword) throws UserException, ChangePasswordException {
-        String username = securityContext.getCallerPrincipal().getName();
-        try {
-            User user = restUserAdapter.getUser(username);
-            if (!user.getPassword().equals(oldPassword)) {
-                throw new ChangePasswordException("Old password is wrong.");
-            }
-            user.setPassword(newPassword);
-            restUserAdapter.updateUser(user, getJwsForUser(user.getUsername()));
-        } catch (NoSuchElementException e) {
-            log.warning("Client %s does not exist".formatted(username));
-            throw new UserException("Client %s does not exist".formatted(username));
-        } catch (JwsException | JOSEException e) {
-            throw new RuntimeException(e);
         }
     }
 }

@@ -21,15 +21,6 @@ public class HotelObjectsFactory {
 
     public static CreateUserDto createUserToAdd() {
         return new CreateUserDto(
-                RandomStringUtils.randomAlphabetic(10),
-                RandomStringUtils.randomAlphabetic(10),
-                RandomStringUtils.randomAlphabetic(10),
-                RandomStringUtils.randomAlphabetic(10),
-                RandomStringUtils.randomAlphabetic(10),
-                RandomStringUtils.randomAlphabetic(10),
-                RandomStringUtils.randomNumeric(2),
-                RandomStringUtils.randomNumeric(2) + "-"
-                        + RandomStringUtils.randomNumeric(3)
-        );
+                RandomStringUtils.randomAlphabetic(10));
     }
 }
