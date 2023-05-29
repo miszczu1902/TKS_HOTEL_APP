@@ -12,12 +12,22 @@ import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.Setter;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.Network;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.MountableFile;
 import rest.dto.GetUserDto;
 import rest.dto.LoginDto;
 
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import static io.restassured.RestAssured.baseURI;
@@ -27,6 +37,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract sealed class AbstractControllerTest permits UserControllerTest {
 
+    /* Images */
+    private static final DockerImageName PAYARA_IMAGE = DockerImageName.parse("payara/server-full:5.2022.4-jdk17");
+    private static final DockerImageName POSTGRES_IMAGE = DockerImageName.parse("postgres:latest");
+
+    /* Network and ports */
+    protected static int POSTGRES_PORT;
+    protected static int PAYARA_PORT;
+
+    private static final Logger logger = LoggerFactory.getLogger("testcontainers-config");
+
+    /* Containers */
+    @Container
+    private static PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>(POSTGRES_IMAGE)
+            .withLogConsumer(new Slf4jLogConsumer(logger))
+            .withDatabaseName("nbddb")
+            .withUsername("nbd")
+            .withPassword("nbdpassword")
+            .withExposedPorts(5432);
+
+    @Container
+    private static GenericContainer<?> PAYARA = new GenericContainer<>(PAYARA_IMAGE)
+            .withLogConsumer(new Slf4jLogConsumer(logger))
+            .withExposedPorts(8080)
+            .withCopyFileToContainer(
+                    MountableFile.forHostPath(Paths.get("target/UserService.war").toAbsolutePath()),
+                    "/opt/payara/deployments/UserService.war")
+            .dependsOn(POSTGRES)
+            .waitingFor(Wait.forLogMessage(".*was successfully deployed in.*", 1));
+
     @Setter
     protected static String bearerToken = "";
 
@@ -35,18 +74,41 @@ public abstract sealed class AbstractControllerTest permits UserControllerTest {
     protected static final LoginDto userData = new LoginDto("miszczu", "123456");
 
     protected static GetUserDto user;
-    protected static Logger logger = LoggerFactory.getLogger("testcontainers-config");
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeClass
     public static void prepareRestAssured() {
-        RestAssured.baseURI = "http://localhost:8080/hotel/api";
-        RestAssured.port = 8080;
-        RestAssured.defaultParser = Parser.JSON;
-        mapper.registerModule(new JavaTimeModule());
-        RestAssured.config = RestAssured.config().objectMapperConfig(new ObjectMapperConfig().jackson2ObjectMapperFactory(
-                (cls, charset) -> mapper
-        ));
+        try (Network network = Network.newNetwork()) {
+            POSTGRES.withNetwork(network).withNetworkAliases("databaseUser");
+            PAYARA.withNetwork(network).withNetworkAliases("appserver");
+
+            POSTGRES.start();
+            POSTGRES_PORT = POSTGRES.getMappedPort(5432);
+            PAYARA.start();
+            PAYARA_PORT = PAYARA.getMappedPort(8080);
+
+            logger.info("Postgres port: " + POSTGRES_PORT);
+            logger.info("Payara port: " + PAYARA_PORT);
+
+            RestAssured.baseURI = "http://localhost:" + PAYARA_PORT + "/user/api";
+            RestAssured.port = PAYARA_PORT;
+            RestAssured.defaultParser = Parser.JSON;
+            RestAssured.useRelaxedHTTPSValidation();
+            mapper.registerModule(new JavaTimeModule());
+            RestAssured.config = RestAssured.config().objectMapperConfig(new ObjectMapperConfig().jackson2ObjectMapperFactory(
+                    (cls, charset) -> mapper
+            ));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @AfterClass
+    public static void endTestAndStopContainers() {
+        PAYARA.stop();
+        logger.info("Payara container stopped.");
+        POSTGRES.stop();
+        logger.info("Postgres container stopped.");
     }
 
     protected static Response sendRequestAndGetResponse(Method method, String path, String jsonBody, ContentType contentType) {

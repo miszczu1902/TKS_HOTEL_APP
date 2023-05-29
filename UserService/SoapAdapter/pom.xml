@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>SoapAdapter</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -145,7 +145,7 @@
                             <wsdlUrls>
                                 <wsdlUrl>http://localhost:8080/hotel/UserService?wsdl</wsdlUrl>
                             </wsdlUrls>
-                            <packageName>soap.adapters</packageName>
+                            <packageName>soap.adapter</packageName>
                         </configuration>
                     </execution>
                 </executions>

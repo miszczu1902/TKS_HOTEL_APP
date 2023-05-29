@@ -42,7 +42,7 @@ public class ReservationControllerTest extends AbstractControllerTest {
                 RoomDto room = HotelObjectsFactory.createRoomToAdd();
                 sendRequestAndGetResponse(
                         Method.POST,
-                        "/rent/rooms",
+                        "/rooms",
                         objectToJson(room),
                         ContentType.JSON);
 
@@ -52,13 +52,13 @@ public class ReservationControllerTest extends AbstractControllerTest {
                         "miszczu");
                 sendRequestAndGetResponse(
                         Method.POST,
-                        "/rent/reservations",
+                        "/reservations",
                         objectToJson(reservationForClient),
                         ContentType.JSON);
 
                 Response roomWithReservations = sendRequestAndGetResponse(
                         Method.GET,
-                        "/rent/rooms/" + room.getRoomNumber() + "/reservations",
+                        "/rooms/" + room.getRoomNumber() + "/reservations",
                         null,
                         null);
 
@@ -80,7 +80,7 @@ public class ReservationControllerTest extends AbstractControllerTest {
 
         Response response = sendRequestAndGetResponse(
                 Method.POST,
-                "/rent/reservations",
+                "/reservations",
                 objectToJson(reservationForMyself),
                 ContentType.JSON);
         assertEqualsCustom(201, response.getStatusCode());

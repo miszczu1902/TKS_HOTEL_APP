@@ -81,7 +81,6 @@ public abstract class AbstractControllerTest {
     @BeforeClass
     public static void prepareRestAssured() {
         try (Network network = Network.newNetwork()) {
-            logger.info("WAR: " + MountableFile.forHostPath(Paths.get("target/RentService.war").toAbsolutePath()).getFilesystemPath());
             POSTGRES.withNetwork(network).withNetworkAliases("databaseRent");
             PAYARA.withNetwork(network).withNetworkAliases("appserver");
 
@@ -93,7 +92,7 @@ public abstract class AbstractControllerTest {
             logger.info("Postgres port: " + POSTGRES_PORT);
             logger.info("Payara port: " + PAYARA_PORT);
 
-            RestAssured.baseURI = "http://localhost:" + PAYARA_PORT + "/hotel/api";
+            RestAssured.baseURI = "http://localhost:" + PAYARA_PORT + "/rent/api";
             RestAssured.port = PAYARA_PORT;
             RestAssured.defaultParser = Parser.JSON;
             RestAssured.useRelaxedHTTPSValidation();

@@ -1,13 +1,8 @@
 package adapter.aggregates.mapper;
 
 import adapter.model.RoleEnt;
-import adapter.model.room.EquipmentTypeEnt;
-import adapter.model.room.RoomEnt;
 import adapter.model.UserEnt;
-import domain.model.Reservation;
 import domain.model.Role;
-import domain.model.room.EquipmentType;
-import domain.model.room.Room;
 import domain.model.User;
 
 import java.util.NoSuchElementException;

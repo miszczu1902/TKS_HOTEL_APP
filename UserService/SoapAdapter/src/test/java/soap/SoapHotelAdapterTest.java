@@ -1,4 +1,4 @@
-package soap.adpater;
+package soap;
 
 import domain.model.Role;
 import org.junit.Test;

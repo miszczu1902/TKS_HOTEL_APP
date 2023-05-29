@@ -1,16 +1,8 @@
 package adapter.aggregates.mapper;
 
-import adapter.model.room.EquipmentTypeEnt;
-import adapter.model.room.RoomEnt;
 import adapter.model.UserEnt;
-import domain.model.Reservation;
-import domain.model.room.EquipmentType;
-import domain.model.room.Room;
 import domain.model.User;
 import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -44,7 +36,6 @@ class ModelMapperTest {
         assertEquals(userEnt.getStreet(), user.getStreet());
         assertEquals(userEnt.getStreetNumber(), user.getStreetNumber());
         assertEquals(userEnt.getPostalCode(), user.getPostalCode());
-
     }
 
 }

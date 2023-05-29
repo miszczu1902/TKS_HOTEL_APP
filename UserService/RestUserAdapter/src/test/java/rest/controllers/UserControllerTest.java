@@ -36,7 +36,6 @@ public final class UserControllerTest extends AbstractControllerTest {
             assertEqualsCustom(user.getStreet(), userData.getStreet());
             assertEqualsCustom(user.getPostalCode(), userData.getPostalCode());
             assertEqualsCustom(Role.valueOf(user.getRole()), userData.getRole());
-
         });
     }
 
@@ -58,7 +57,6 @@ public final class UserControllerTest extends AbstractControllerTest {
         assertEqualsCustom(user.getCity(), userData.getCity());
         assertEqualsCustom(user.getStreet(), userData.getStreet());
         assertEqualsCustom(user.getPostalCode(), userData.getPostalCode());
-
     }
 
     @Test
@@ -76,6 +74,5 @@ public final class UserControllerTest extends AbstractControllerTest {
 
         response = sendRequestAndGetResponse(Method.POST, "/users/" + userToAdd.getUsername() + "/activate", null, null);
         assertEqualsCustom(204, response.getStatusCode());
-
     }
 }

@@ -2,3 +2,6 @@
 **/target
 **/out
 **/*.iml
+**/*.war
+/RentService/RestRentAdapter/RentService.war
+/UserService/RestUserAdapter/UserService.war

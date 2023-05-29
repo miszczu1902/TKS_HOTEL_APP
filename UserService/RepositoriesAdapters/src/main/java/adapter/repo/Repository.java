@@ -11,7 +11,7 @@ import java.sql.Connection;
         className = "org.postgresql.ds.PGSimpleDataSource",
         user = "nbd",
         password = "nbdpassword",
-        serverName = "database",
+        serverName = "databaseUser",
         portNumber = 5432,
         databaseName = "nbddb",
         isolationLevel = Connection.TRANSACTION_READ_COMMITTED)
