@@ -1,5 +1,6 @@
-package rest.auth;
+package security;
 
+import auth.JwtGenerator;
 import io.jsonwebtoken.Claims;
 
 import javax.enterprise.context.ApplicationScoped;

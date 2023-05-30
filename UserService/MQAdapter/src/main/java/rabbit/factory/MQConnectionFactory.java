@@ -12,7 +12,7 @@ import java.util.concurrent.TimeoutException;
 @ApplicationScoped
 public class MQConnectionFactory {
     @Inject
-    @ConfigProperty(name = "rabbit.hostname", defaultValue = "localhost")
+    @ConfigProperty(name = "rabbit.hostname", defaultValue = "172.55.0.5")
     private String hostname;
 
     @Inject
@@ -33,8 +33,8 @@ public class MQConnectionFactory {
         factory.setPort(port);
         factory.setUsername(username);
         factory.setPassword(password);
-        try (Connection connection = factory.newConnection()) {
-            return connection;
+        try {
+            return factory.newConnection();
         } catch (IOException | TimeoutException e) {
             throw new RuntimeException(e);
         }

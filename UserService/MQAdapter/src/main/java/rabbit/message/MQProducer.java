@@ -3,6 +3,7 @@ package rabbit.message;
 import com.rabbitmq.client.*;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import rabbit.event.UserCreatedEvent;
+import rabbit.exceptions.MQException;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -25,38 +26,32 @@ public class MQProducer {
     private String exchangeName;
 
     public void produce(UserCreatedEvent event) {
-        if (channel == null) {
-            System.out.println("Error during initializing consumer, connection is not established");
-            return;
-        }
-
+        if (channel == null)
+            throw new MQException("Error during initializing consumer, connection is not established");
         String message;
         try (Jsonb jsonb = JsonbBuilder.create()) {
             message = jsonb.toJson(event);
         } catch (Exception e) {
-            System.out.println("Invalid message format");
-            return;
+            throw new MQException("Invalid message format");
         }
 
         try {
             channel.basicPublish(exchangeName, queueName, null, message.getBytes());
         } catch (IOException e) {
-            System.out.println("Error during producing message, connection is not established");
+            throw new MQException("Error during producing message, connection is not established");
         }
     }
 
     @PostConstruct
     private void initProducer() {
-        if (channel == null) {
-            System.out.println("Error during initializing producer, connection is not established");
-            return;
-        }
+        if (channel == null)
+            throw new MQException("Error during initializing producer, connection is not established");
         try {
             channel.exchangeDeclare(exchangeName, BuiltinExchangeType.DIRECT, true);
             channel.queueDeclare(queueName, true, false, false, null);
             channel.queueBind(queueName, exchangeName, queueName);
         } catch (IOException ignored) {
-            System.out.println("Error during connecting to queue");
+            throw new MQException("Error during connecting to queue");
         }
     }
 }

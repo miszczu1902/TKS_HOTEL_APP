@@ -1,6 +1,7 @@
 package rest.controllers;
 
 import adapter.RestUserAdapter;
+import auth.JwsGenerator;
 import com.nimbusds.jose.JOSEException;
 import domain.exceptions.ChangePasswordException;
 import domain.exceptions.JwsException;
@@ -11,7 +12,6 @@ import mapper.RestMapper;
 import org.jetbrains.annotations.NotNull;
 import rabbit.event.UserCreatedEvent;
 import rabbit.message.MQProducer;
-import rest.auth.JwsGenerator;
 import rest.dto.ChangePasswordDto;
 import rest.dto.CreateUserDto;
 import rest.dto.GetUserDto;

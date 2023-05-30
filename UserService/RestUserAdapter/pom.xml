@@ -39,14 +39,14 @@
             <artifactId>ApplicationPorts</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>tks.user</groupId>-->
-<!--            <artifactId>SoapAdapter</artifactId>-->
-<!--            <version>1.0-SNAPSHOT</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>tks.user</groupId>
             <artifactId>MQAdapter</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>tks.user</groupId>
+            <artifactId>UserSecurity</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>

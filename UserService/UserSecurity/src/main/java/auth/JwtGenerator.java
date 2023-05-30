@@ -1,12 +1,14 @@
-package rest.auth;
+package auth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.util.Date;
 
+@ApplicationScoped
 public class JwtGenerator {
 
     private static final String SECRET = "f4h9t87t3g473HGufuJ8fFHU4j39j48fmu948cx48cu2j9fj";

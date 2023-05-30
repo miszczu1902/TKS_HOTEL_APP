@@ -1,8 +1,9 @@
-package rest.auth;
+package auth;
 
-import adapter.RestUserAdapter;
 import domain.model.User;
+import service.port.infrasturcture.UserInfServicePort;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.security.enterprise.SecurityContext;
 import javax.security.enterprise.credential.UsernamePasswordCredential;
@@ -11,10 +12,11 @@ import javax.security.enterprise.identitystore.IdentityStore;
 import javax.ws.rs.core.Context;
 import java.util.*;
 
+@ApplicationScoped
 public class AuthIdentityStore implements IdentityStore {
 
     @Inject
-    private RestUserAdapter restUserAdapter;
+    private UserInfServicePort restUserAdapter;
 
     @Context
     private SecurityContext securityContext;

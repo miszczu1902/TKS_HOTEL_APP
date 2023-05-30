@@ -1,11 +1,13 @@
-package rest.auth;
+package auth;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.text.ParseException;
 
+@ApplicationScoped
 public class JwsGenerator {
 
     private static final String SECRET = "f4h9t87t3g473HGufuJ8fFHU4j39j48fmu948cx48cu2j9fj";

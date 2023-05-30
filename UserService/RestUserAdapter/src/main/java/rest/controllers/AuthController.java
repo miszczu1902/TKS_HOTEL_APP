@@ -1,7 +1,7 @@
 package rest.controllers;
 
-import rest.auth.AuthIdentityStore;
-import rest.auth.JwtGenerator;
+import auth.AuthIdentityStore;
+import auth.JwtGenerator;
 import rest.dto.LoginDto;
 
 import javax.annotation.security.RolesAllowed;
