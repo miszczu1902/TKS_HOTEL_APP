@@ -15,6 +15,7 @@
     <module>ApplicationPorts</module>
     <module>ApplicationServicePorts</module>
     <module>RestRentAdapter</module>
+    <module>MQController</module>
   </modules>
 
   <dependencyManagement>
@@ -230,7 +231,7 @@
             </archive>
 <!--            <outputDirectory>${project.build.directory}/../../docker</outputDirectory>-->
 <!--            <outputDirectory>${project.build.directory}</outputDirectory>-->
-            <warName>RentService</warName>
+<!--            <warName>RentService</warName>-->
           </configuration>
           <executions>
             <execution>

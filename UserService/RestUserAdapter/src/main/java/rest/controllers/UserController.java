@@ -9,6 +9,8 @@ import domain.model.Role;
 import domain.model.User;
 import mapper.RestMapper;
 import org.jetbrains.annotations.NotNull;
+import rabbit.event.UserCreatedEvent;
+import rabbit.message.MQProducer;
 import rest.auth.JwsGenerator;
 import rest.dto.ChangePasswordDto;
 import rest.dto.CreateUserDto;
@@ -43,6 +45,9 @@ public class UserController {
 
     @Inject
     private JwsGenerator jwsGenerator;
+
+    @Inject
+    private MQProducer producer;
 
     private final Logger log = Logger.getLogger(getClass().getName());
 
@@ -129,6 +134,7 @@ public class UserController {
     public Response addUser(@Valid CreateUserDto user) {
         try {
             restUserAdapter.addUser(RestMapper.createUserDtoToUser(user));
+            producer.produce(new UserCreatedEvent(user.getUsername()));
             return Response.created(URI.create("/users/%s".formatted(user.getUsername()))).build();
         } catch (UserException e) {
             return Response.status(Response.Status.CONFLICT.getStatusCode()).build();

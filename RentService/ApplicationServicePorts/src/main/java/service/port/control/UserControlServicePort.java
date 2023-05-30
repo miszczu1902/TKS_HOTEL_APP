@@ -4,12 +4,7 @@ import domain.exceptions.UserException;
 import domain.model.user.User;
 
 public interface UserControlServicePort {
-
     void addUser(User user) throws UserException;
 
     void updateUser(User user) throws UserException;
-
-    void activateUser(String username) throws UserException;
-
-    void deactivateUser(String username) throws UserException;
 }

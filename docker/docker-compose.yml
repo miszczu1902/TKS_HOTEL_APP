@@ -1,6 +1,21 @@
 version: '3.9'
 
 services:
+  rabbitmq:
+    image: bitnami/rabbitmq:latest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    extra_hosts:
+      - "databaseRent:172.55.0.4"
+      - "databaseUser:172.55.0.3"
+      - "appserver:172.25.0.2"
+    volumes:
+      - ./create_users.sh:/docker-entrypoint-initdb.d/create_users.sh
+    networks:
+      tks:
+        ipv4_address: 172.55.0.5
+
   payara:
     image: payara/server-full:5.2022.4-jdk17
     ports:

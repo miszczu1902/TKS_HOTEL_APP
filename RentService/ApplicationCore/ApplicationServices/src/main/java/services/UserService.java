@@ -10,7 +10,6 @@ import service.port.infrasturcture.UserInfServicePort;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
@@ -27,11 +26,6 @@ public class UserService implements UserControlServicePort, UserInfServicePort {
     private final Logger log = Logger.getLogger(getClass().getName());
 
     @Override
-    public List<User> getAllUsers() {
-        return userInfPort.getAll();
-    }
-
-    @Override
     public void addUser(User user) throws UserException {
         try {
             userInfPort.get(user.getUsername());
@@ -43,40 +37,8 @@ public class UserService implements UserControlServicePort, UserInfServicePort {
     }
 
     @Override
-    public void updateUser(User user) throws UserException {
+    public void updateUser(User user) {
         userControlPort.update(user);
-    }
-
-    @Override
-    public void deactivateUser(String username) throws UserException {
-        try {
-            User user = userInfPort.get(username);
-            userControlPort.update(user);
-        } catch (NoSuchElementException e) {
-            log.warning("Client %s does not exist".formatted(username));
-            throw new UserException("Client %s does not exist".formatted(username));
-        }
-    }
-
-    @Override
-    public void activateUser(String username) throws UserException {
-        try {
-            User user = userInfPort.get(username);
-            userControlPort.update(user);
-        } catch (NoSuchElementException e) {
-            log.warning("Client %s does not exist".formatted(username));
-            throw new UserException("Client %s does not exist".formatted(username));
-        }
-    }
-
-    @Override
-    public List<User> getAllClients() {
-        return userInfPort.getAllClients();
-    }
-
-    @Override
-    public List<User> getUsersByUsername(String pattern) {
-        return userInfPort.getByUsername(pattern);
     }
 
     @Override
@@ -84,8 +46,13 @@ public class UserService implements UserControlServicePort, UserInfServicePort {
         return userInfPort.get(username);
     }
 
-    @Override
-    public User getByUsernameAndPassword(String username, String password) {
-        return userInfPort.getByUsernameAndPasswd(username, password);
+    public void processMessage(String oldUsername, String newUsername) throws UserException {
+        User user = userInfPort.get(oldUsername);
+        if (user == null) {
+            addUser(new User(oldUsername));
+        } else {
+            user.setUsername(newUsername);
+            userControlPort.update(user);
+        }
     }
 }
