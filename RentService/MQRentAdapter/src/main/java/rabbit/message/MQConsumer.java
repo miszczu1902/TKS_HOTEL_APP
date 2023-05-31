@@ -11,10 +11,8 @@ import rabbit.exceptions.MQException;
 import service.port.control.UserRentControlServicePort;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.Startup;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
-import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;

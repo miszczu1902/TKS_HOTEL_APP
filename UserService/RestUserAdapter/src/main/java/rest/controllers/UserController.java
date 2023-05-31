@@ -9,6 +9,7 @@ import domain.exceptions.UserException;
 import domain.model.Role;
 import domain.model.User;
 import mapper.RestMapper;
+import org.eclipse.microprofile.metrics.annotation.Counted;
 import org.jetbrains.annotations.NotNull;
 import rabbit.message.MQProducer;
 import rest.dto.ChangePasswordDto;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Path("/users")
+@Counted(name = "exampleCounter", description = "Example counter")
 public class UserController {
 
     @Inject
@@ -44,6 +46,13 @@ public class UserController {
 
     @Inject
     private MQProducer producer;
+
+    @GET
+    @PermitAll
+    @Path("/health-check")
+    public Response checkHealthy() {
+        return Response.ok().build();
+    }
 
     @GET
     @PermitAll

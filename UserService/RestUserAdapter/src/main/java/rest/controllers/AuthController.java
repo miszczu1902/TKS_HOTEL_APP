@@ -2,6 +2,7 @@ package rest.controllers;
 
 import auth.AuthIdentityStore;
 import auth.JwtGenerator;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import rest.dto.LoginDto;
 
 import javax.annotation.security.RolesAllowed;
@@ -30,11 +31,11 @@ public class AuthController {
     @Inject
     private JwtGenerator jwtGenerator;
 
-
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("GUEST")
+    @Retry(delay = 100, maxDuration = 1000, jitter = 100, maxRetries = 5)
     public Response login(LoginDto loginDto) {
         UsernamePasswordCredential usernamePasswordCredential = new UsernamePasswordCredential(loginDto.getUsername(), loginDto.getPassword());
         CredentialValidationResult credentialValidationResult = authIdentityStore.validate(usernamePasswordCredential);

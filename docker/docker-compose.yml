@@ -1,6 +1,42 @@
 version: '3.9'
 
 services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "databaseRent:172.55.0.4"
+      - "databaseUser:172.55.0.3"
+      - "appserver:172.55.0.2"
+      - "rabbitmq:172.55.0.5"
+      - "grafana:172.55.0.6"
+    networks:
+      tks:
+        ipv4_address: 172.55.0.7
+    volumes:
+      - ./prometheus:/etc/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - "databaseRent:172.55.0.4"
+      - "databaseUser:172.55.0.3"
+      - "appserver:172.55.0.2"
+      - "rabbitmq:172.55.0.5"
+      - "prometheus:172.55.0.7"
+    networks:
+      tks:
+        ipv4_address: 172.55.0.6
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - ./grafana:/var/lib/grafana
+
   rabbitmq:
     image: bitnami/rabbitmq:latest
     ports:
@@ -9,7 +45,7 @@ services:
     extra_hosts:
       - "databaseRent:172.55.0.4"
       - "databaseUser:172.55.0.3"
-      - "appserver:172.25.0.2"
+      - "appserver:172.55.0.2"
     volumes:
       - ./create_users.sh:/docker-entrypoint-initdb.d/create_users.sh
     networks:
@@ -30,8 +66,9 @@ services:
         ipv4_address: 172.55.0.2
     environment:
       - JVM_ARGS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:9009
-#    volumes:
-#      - ../RestAdapter/target/RestAdapter-1.0-SNAPSHOT.war:/opt/payara/deployments/RestAdapter-1.0-SNAPSHOT.war
+    volumes:
+      - ../RentService/RestRentAdapter/target/RestRentAdapter-1.0-SNAPSHOT.war:/opt/payara/deployments/RestRentAdapter-1.0-SNAPSHOT.war
+      - ../UserService/RestUserAdapter/target/RestUserAdapter-1.0-SNAPSHOT.war:/opt/payara/deployments/RestUserAdapter-1.0-SNAPSHOT.war
 
   db-rent:
     image: postgres
@@ -44,7 +81,7 @@ services:
       - "5433:5432"
     networks:
       tks:
-        ipv4_address: 172.55.0.3
+        ipv4_address: 172.55.0.4
   db-user:
     image: postgres
     restart: always
@@ -56,7 +93,7 @@ services:
       - "5432:5432"
     networks:
       tks:
-        ipv4_address: 172.55.0.4
+        ipv4_address: 172.55.0.3
 
 networks:
   tks:
