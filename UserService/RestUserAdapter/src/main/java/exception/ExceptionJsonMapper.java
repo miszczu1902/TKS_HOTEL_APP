@@ -36,6 +36,5 @@ public class ExceptionJsonMapper implements ExceptionMapper<Throwable> {
                 .entity(new ErrorResponseDTO(statusCode, throwable.getMessage()))
                 .type(MediaType.APPLICATION_JSON_TYPE)
                 .build();
-
     }
 }

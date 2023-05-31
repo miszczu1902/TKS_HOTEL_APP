@@ -40,74 +40,56 @@ public class ReservationController {
     private SecurityContext securityContext;
 
     @POST
-//    @RolesAllowed({"ADMIN", "MODERATOR"})
+    @RolesAllowed({"ADMIN", "MODERATOR"})
     @Consumes(MediaType.APPLICATION_JSON)
     public Response reserveRoom(@Valid ReservationDto reservation) throws LogicException {
-        try {
-            restReservationAdapter.reserveRoom(new Reservation(
-                            restRoomAdapter.getRoom(reservation.getRoomNumber()),
-                            LocalDate.parse(reservation.getBeginTime()),
-                            LocalDate.parse(reservation.getEndTime()),
-                            restUserAdapter.getUser(reservation.getUsername())
-                    )
-            );
-            return Response.created(URI.create("/Reservations/%s".formatted(reservation.getRoomNumber()))).build();
-        } catch (ReservationException | ValidationException e) {
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
-        }
+        restReservationAdapter.reserveRoom(new Reservation(
+                        restRoomAdapter.getRoom(reservation.getRoomNumber()),
+                        LocalDate.parse(reservation.getBeginTime()),
+                        LocalDate.parse(reservation.getEndTime()),
+                        restUserAdapter.getUser(reservation.getUsername())
+                )
+        );
+        return Response.created(URI.create("/Reservations/%s".formatted(reservation.getRoomNumber()))).build();
     }
 
     @POST
-//    @RolesAllowed({"USER"})
+    @RolesAllowed({"USER"})
     @Path("/self")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response reserveRoomByClient(@Valid ReservationSelfDto reservation) throws LogicException {
-        try {
-            String username = securityContext.getUserPrincipal().getName();
-            Room room = restRoomAdapter.getRoom(reservation.getRoomNumber());
-            User user = restUserAdapter.getUser(username);
-            restReservationAdapter.reserveRoom(new Reservation(
-                    room,
-                    LocalDate.parse(reservation.getBeginTime()),
-                    LocalDate.parse(reservation.getEndTime()),
-                    user));
-            return Response.created(URI.create("/Reservations/%s".formatted(reservation.getRoomNumber()))).build();
-        } catch (ReservationException | ValidationException e) {
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
-        }
+        String username = securityContext.getUserPrincipal().getName();
+        Room room = restRoomAdapter.getRoom(reservation.getRoomNumber());
+        User user = restUserAdapter.getUser(username);
+        restReservationAdapter.reserveRoom(new Reservation(
+                room,
+                LocalDate.parse(reservation.getBeginTime()),
+                LocalDate.parse(reservation.getEndTime()),
+                user));
+        return Response.created(URI.create("/Reservations/%s".formatted(reservation.getRoomNumber()))).build();
     }
 
     @POST
-//    @RolesAllowed({"ADMIN", "MODERATOR"})
+    @RolesAllowed({"ADMIN", "MODERATOR"})
     @Path("/{reservationId}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response endReserveRoom(@PathParam("reservationId") String reservationId) {
-        try {
-            restReservationAdapter.endReserveRoom(reservationId);
-            return Response.ok().build();
-        } catch (NoSuchElementException e) {
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
-        }
+    public Response endReserveRoom(@PathParam("reservationId") String reservationId) throws LogicException {
+        restReservationAdapter.endReserveRoom(reservationId);
+        return Response.ok().build();
     }
 
     @GET
-//    @RolesAllowed({"ADMIN", "MODERATOR"})
+    @RolesAllowed({"ADMIN", "MODERATOR"})
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllReservations() {
         return Response.ok().entity(restReservationAdapter.getAllReservations()).build();
     }
 
     @GET
-//    @RolesAllowed({"ADMIN", "MODERATOR"})
+    @RolesAllowed({"ADMIN", "MODERATOR"})
     @Path("/{reservationId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getReservationById(@PathParam("reservationId") String reservationId) {
-        try {
-            return Response.ok().entity(restReservationAdapter.getReservationById(reservationId)).build();
-        } catch (ReservationException e) {
-            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
-        }
+    public Response getReservationById(@PathParam("reservationId") String reservationId) throws ReservationException {
+        return Response.ok().entity(restReservationAdapter.getReservationById(reservationId)).build();
     }
 }
