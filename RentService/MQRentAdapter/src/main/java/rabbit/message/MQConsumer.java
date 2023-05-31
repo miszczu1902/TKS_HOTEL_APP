@@ -11,17 +11,16 @@ import rabbit.exceptions.MQException;
 import service.port.control.UserRentControlServicePort;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.ActivationConfigProperty;
-import javax.ejb.MessageDriven;
+import javax.ejb.Startup;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Initialized;
+import javax.enterprise.context.RequestScoped;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import javax.jms.Message;
-import javax.jms.MessageListener;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
 
 @ApplicationScoped
 public class MQConsumer {
@@ -36,7 +35,7 @@ public class MQConsumer {
     private UserRentControlServicePort userControlServicePort;
 
     @PostConstruct
-    public void initConsumer() {
+    public void initConsumer(@Observes @Initialized(ApplicationScoped.class) Object init) {
         if (channel == null)
             throw new MQException("Error during initializing producer, connection is not established");
         try {

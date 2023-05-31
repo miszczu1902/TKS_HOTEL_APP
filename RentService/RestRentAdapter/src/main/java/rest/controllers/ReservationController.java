@@ -8,13 +8,11 @@ import domain.exceptions.ReservationException;
 import domain.model.Reservation;
 import domain.model.room.Room;
 import domain.model.user.User;
-import rabbit.message.MQConsumer;
 import rest.dto.ReservationDto;
 import rest.dto.ReservationSelfDto;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
-import javax.interceptor.Interceptors;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -38,9 +36,6 @@ public class ReservationController {
 
     @Context
     private SecurityContext securityContext;
-
-    @Inject
-    private MQConsumer consumer;
 
     @POST
     @RolesAllowed({"ADMIN", "MODERATOR"})
