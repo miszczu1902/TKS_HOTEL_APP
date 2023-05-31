@@ -2,7 +2,7 @@ package data.port.control;
 
 import domain.model.user.User;
 
-public interface UserControlPort {
+public interface UserRentControlPort {
 
     void add(User element);
 

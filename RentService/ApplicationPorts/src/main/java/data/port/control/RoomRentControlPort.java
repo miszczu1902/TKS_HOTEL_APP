@@ -2,7 +2,7 @@ package data.port.control;
 
 import domain.model.room.Room;
 
-public interface RoomControlPort {
+public interface RoomRentControlPort {
 
     void add(Room element);
 

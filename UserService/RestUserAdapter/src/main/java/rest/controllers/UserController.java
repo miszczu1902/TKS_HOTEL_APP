@@ -18,7 +18,6 @@ import rest.dto.UpdateUserDto;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.security.enterprise.SecurityContext;
 import javax.servlet.http.HttpServletRequest;

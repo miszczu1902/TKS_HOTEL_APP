@@ -7,7 +7,7 @@ import javax.annotation.sql.DataSourceDefinition;
 import java.sql.Connection;
 
 @DataSourceDefinition(
-        name = "java:app/jdbc/TEST_HOTEL",
+        name = "java:app/jdbc/TEST_HOTEL_USER",
         className = "org.postgresql.ds.PGSimpleDataSource",
         user = "nbd",
         password = "nbdpassword",
@@ -16,6 +16,6 @@ import java.sql.Connection;
         databaseName = "nbddb",
         isolationLevel = Connection.TRANSACTION_READ_COMMITTED)
 public class Repository {
-    @PersistenceContext(unitName = "TEST_HOTEL")
+    @PersistenceContext(unitName = "TEST_HOTEL_USER")
     private EntityManager entityManager;
 }

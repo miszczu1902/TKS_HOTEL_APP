@@ -2,8 +2,8 @@ package adapter.aggregates.adapters;
 
 import adapter.aggregates.mapper.ModelMapper;
 import adapter.model.room.RoomEnt;
-import data.port.control.RoomControlPort;
-import data.port.infrastructure.RoomInfPort;
+import data.port.control.RoomRentControlPort;
+import data.port.infrastructure.RoomRentInfPort;
 import domain.model.room.Room;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,9 +20,9 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 @ApplicationScoped
-public class RoomRepositoryAdapter implements RoomInfPort, RoomControlPort {
+public class RoomRentRepositoryAdapter implements RoomRentInfPort, RoomRentControlPort {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "TEST_HOTEL_RENT")
     private EntityManager entityManager;
 
     @Override

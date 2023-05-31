@@ -8,13 +8,14 @@ import domain.exceptions.ReservationException;
 import domain.model.Reservation;
 import domain.model.room.Room;
 import domain.model.user.User;
+import rabbit.message.MQConsumer;
 import rest.dto.ReservationDto;
 import rest.dto.ReservationSelfDto;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
+import javax.interceptor.Interceptors;
 import javax.validation.Valid;
-import javax.validation.ValidationException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -22,7 +23,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.NoSuchElementException;
 
 @Path("/reservations")
 public class ReservationController {
@@ -38,6 +38,9 @@ public class ReservationController {
 
     @Context
     private SecurityContext securityContext;
+
+    @Inject
+    private MQConsumer consumer;
 
     @POST
     @RolesAllowed({"ADMIN", "MODERATOR"})

@@ -4,7 +4,7 @@ import domain.model.Reservation;
 
 import java.util.List;
 
-public interface ReservationInfPort {
+public interface ReservationRentInfPort {
 
     List<Reservation> find(Object... elements);
 

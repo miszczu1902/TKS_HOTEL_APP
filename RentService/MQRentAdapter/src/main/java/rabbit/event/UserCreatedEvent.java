@@ -13,9 +13,11 @@ public class UserCreatedEvent {
     private String username;
 
     private Boolean isModified;
+    private Boolean isCreated;
 
     public UserCreatedEvent(@NonNull String username) {
         this.username = username;
         this.isModified = false;
+        this.isCreated = true;
     }
 }

@@ -2,8 +2,8 @@ package adapter;
 
 import domain.exceptions.RoomException;
 import domain.model.room.Room;
-import service.port.control.RoomControlServicePort;
-import service.port.infrasturcture.RoomInfServicePort;
+import service.port.control.RoomRentControlServicePort;
+import service.port.infrasturcture.RoomRentInfServicePort;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -13,28 +13,28 @@ import java.util.List;
 public class RestRoomAdapter {
 
     @Inject
-    private RoomInfServicePort roomInfServicePort;
+    private RoomRentInfServicePort roomRentInfServicePort;
 
     @Inject
-    private RoomControlServicePort roomControlServicePort;
+    private RoomRentControlServicePort roomRentControlServicePort;
 
     public List<Room> getAllRooms() {
-        return roomInfServicePort.getAllRooms();
+        return roomRentInfServicePort.getAllRooms();
     }
 
     public Room getRoom(int roomNumber) {
-        return roomInfServicePort.getRoom(roomNumber);
+        return roomRentInfServicePort.getRoom(roomNumber);
     }
 
     public void addRoom(Room room) throws RoomException {
-        roomControlServicePort.addRoom(room);
+        roomRentControlServicePort.addRoom(room);
     }
 
     public void updateRoom(Room room) throws RoomException {
-        roomControlServicePort.updateRoom(room);
+        roomRentControlServicePort.updateRoom(room);
     }
 
     public void removeRoom(Room room) throws RoomException {
-        roomControlServicePort.removeRoom(room.getRoomNumber());
+        roomRentControlServicePort.removeRoom(room.getRoomNumber());
     }
 }

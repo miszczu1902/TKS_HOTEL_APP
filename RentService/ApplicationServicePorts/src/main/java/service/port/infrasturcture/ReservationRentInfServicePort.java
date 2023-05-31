@@ -5,7 +5,7 @@ import domain.model.Reservation;
 
 import java.util.List;
 
-public interface ReservationInfServicePort {
+public interface ReservationRentInfServicePort {
 
     List<Reservation> getAllReservations();
 

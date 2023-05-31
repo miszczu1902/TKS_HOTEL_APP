@@ -4,7 +4,7 @@ import domain.model.room.Room;
 
 import java.util.List;
 
-public interface RoomInfPort {
+public interface RoomRentInfPort {
 
     Room get(Object element);
 

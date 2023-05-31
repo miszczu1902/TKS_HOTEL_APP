@@ -1,17 +1,17 @@
 package services;
 
-import data.port.control.ReservationControlPort;
-import data.port.infrastructure.ReservationInfPort;
-import data.port.infrastructure.RoomInfPort;
-import data.port.infrastructure.UserInfPort;
+import data.port.control.ReservationRentControlPort;
+import data.port.infrastructure.ReservationRentInfPort;
+import data.port.infrastructure.RoomRentInfPort;
+import data.port.infrastructure.UserRentInfPort;
 import domain.exceptions.LogicException;
 import domain.exceptions.ReservationException;
 import domain.exceptions.RoomException;
 import domain.exceptions.UserException;
 import domain.model.Reservation;
 import domain.model.room.Room;
-import service.port.control.ReservationControlServicePort;
-import service.port.infrasturcture.ReservationInfServicePort;
+import service.port.control.ReservationRentControlServicePort;
+import service.port.infrasturcture.ReservationRentInfServicePort;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -22,24 +22,24 @@ import java.util.logging.Logger;
 
 @ApplicationScoped
 @Transactional(dontRollbackOn = NoSuchElementException.class)
-public class ReservationService implements ReservationInfServicePort, ReservationControlServicePort {
+public class ReservationRentService implements ReservationRentInfServicePort, ReservationRentControlServicePort {
 
     @Inject
-    private UserInfPort userInfPort;
+    private UserRentInfPort userRentInfPort;
 
     @Inject
-    private RoomInfPort roomInfPort;
+    private RoomRentInfPort roomRentInfPort;
 
     @Inject
-    private ReservationInfPort reservationInfPort;
+    private ReservationRentInfPort reservationRentInfPort;
 
     @Inject
-    private ReservationControlPort reservationControlPort;
+    private ReservationRentControlPort reservationRentControlPort;
 
     private final Logger log = Logger.getLogger(getClass().getName());
 
     private boolean checkIfRoomCantBeReserved(int roomNumber, LocalDate beginTime) {
-        List<Reservation> reservations = Optional.of(reservationInfPort.getAll()).orElse(Collections.emptyList());
+        List<Reservation> reservations = Optional.of(reservationRentInfPort.getAll()).orElse(Collections.emptyList());
         if (reservations.isEmpty()) {
             return false;
         } else {
@@ -55,10 +55,10 @@ public class ReservationService implements ReservationInfServicePort, Reservatio
     public void reserveRoom(Reservation reservation) throws LogicException {
         try {
             int roomNumber = reservation.getRoom().getRoomNumber();
-            Room room = roomInfPort.get(roomNumber);
+            Room room = roomRentInfPort.get(roomNumber);
             String username = reservation.getUser().getUsername();
 
-            if (userInfPort.get(username) != null) {
+            if (userRentInfPort.get(username) != null) {
                 LocalDate beginTime = LocalDate.parse(reservation.getBeginTime().toString());
                 LocalDate endTime = LocalDate.parse(reservation.getEndTime().toString());
                 LocalDate now = LocalDate.now();
@@ -73,9 +73,9 @@ public class ReservationService implements ReservationInfServicePort, Reservatio
                     log.warning("Room %s is currently reserved".formatted(roomNumber));
                     throw new RoomException("Room is currently reserved");
                 } else {
-                    Reservation newReservation = new Reservation(room, beginTime, endTime, userInfPort.get(username));
+                    Reservation newReservation = new Reservation(room, beginTime, endTime, userRentInfPort.get(username));
                     newReservation.calculateReservationCost();
-                    reservationControlPort.add(newReservation);
+                    reservationRentControlPort.add(newReservation);
                 }
             } else {
                 throw new UserException("Client is not active");
@@ -89,10 +89,10 @@ public class ReservationService implements ReservationInfServicePort, Reservatio
     @Override
     public void endReserveRoom(String reservationId) throws LogicException {
         LocalDate now = LocalDate.now();
-        Reservation reservation = reservationInfPort.get(UUID.fromString(reservationId));
+        Reservation reservation = reservationRentInfPort.get(UUID.fromString(reservationId));
 
         if (reservation.getBeginTime().isAfter(now)) {
-            reservationControlPort.remove(reservation);
+            reservationRentControlPort.remove(reservation);
         } else if (reservation.getBeginTime().isBefore(now)
                 && reservation.getEndTime().isBefore(now)) {
             reservation.calculateReservationCost();
@@ -106,14 +106,14 @@ public class ReservationService implements ReservationInfServicePort, Reservatio
             reservation.calculateReservationCost();
 
             reservation.setActive(false);
-            reservationControlPort.update(reservation);
+            reservationRentControlPort.update(reservation);
         }
     }
 
     @Override
     public Reservation getReservationById(String reservationId) throws ReservationException {
         try {
-            return reservationInfPort.get(UUID.fromString(reservationId));
+            return reservationRentInfPort.get(UUID.fromString(reservationId));
         } catch (NoSuchElementException e) {
             log.warning("Any reservation for a given id %s doesn't exist".formatted(reservationId));
             throw new ReservationException("Any reservation for a given condition doesn't exist");
@@ -122,13 +122,13 @@ public class ReservationService implements ReservationInfServicePort, Reservatio
 
     @Override
     public List<Reservation> getAllReservations() {
-        return Optional.ofNullable(reservationInfPort.getAll()).orElse(Collections.emptyList());
+        return Optional.ofNullable(reservationRentInfPort.getAll()).orElse(Collections.emptyList());
     }
 
     @Override
     public List<Reservation> getReservationsForClient(String username) throws ReservationException {
         try {
-            return reservationInfPort.find(username);
+            return reservationRentInfPort.find(username);
         } catch (NoSuchElementException e) {
             log.warning("Any reservation for a given username %s doesn't exist".formatted(username));
             throw new ReservationException("Any reservation for a given condition doesn't exist");
@@ -138,7 +138,7 @@ public class ReservationService implements ReservationInfServicePort, Reservatio
     @Override
     public List<Reservation> getReservationsForRoom(int roomNumber) throws ReservationException {
         try {
-            return reservationInfPort.getReservationsByRoomNumber(roomNumber);
+            return reservationRentInfPort.getReservationsByRoomNumber(roomNumber);
         } catch (NoSuchElementException e) {
             log.warning("Any reservation for a given room with number %s doesn't exist".formatted(roomNumber));
             throw new ReservationException("Any reservation for a given condition doesn't exist");

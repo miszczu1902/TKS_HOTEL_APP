@@ -3,7 +3,7 @@ package service.port.control;
 import domain.exceptions.LogicException;
 import domain.model.Reservation;
 
-public interface ReservationControlServicePort {
+public interface ReservationRentControlServicePort {
 
     void reserveRoom(Reservation reservation) throws LogicException;
 

@@ -1,7 +1,7 @@
 package adapter;
 
 import domain.model.user.User;
-import service.port.infrasturcture.UserInfServicePort;
+import service.port.infrasturcture.UserRentInfServicePort;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -10,10 +10,10 @@ import javax.inject.Inject;
 public class RestUserAdapter {
 
     @Inject
-    private UserInfServicePort userInfServicePort;
+    private UserRentInfServicePort userRentInfServicePort;
 
     public User getUser(String username) {
-        return userInfServicePort.getUser(username);
+        return userRentInfServicePort.getUser(username);
     }
 
 }

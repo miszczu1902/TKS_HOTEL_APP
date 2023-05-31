@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class UserRepositoryAdapter implements UserInfPort, UserControlPort {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "TEST_HOTEL_USER")
     private EntityManager entityManager;
 
     @Override
