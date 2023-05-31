@@ -2,6 +2,7 @@ package mapper;
 
 import domain.model.Role;
 import domain.model.User;
+import rabbit.event.UserCreatedEvent;
 import rest.dto.CreateUserDto;
 
 public class RestMapper {
@@ -18,6 +19,10 @@ public class RestMapper {
                 user.getStreet(),
                 user.getStreetNumber(),
                 user.getPostalCode());
+    }
+
+    public static UserCreatedEvent createUserDtoToUserCreatedEvent(CreateUserDto user) {
+        return new UserCreatedEvent(user.getUsername());
     }
 
 }

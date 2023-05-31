@@ -4,7 +4,7 @@ import auth.JwtGenerator;
 import io.jsonwebtoken.Claims;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.security.enterprise.AuthenticationException;
+import javax.inject.Inject;
 import javax.security.enterprise.AuthenticationStatus;
 import javax.security.enterprise.authentication.mechanism.http.HttpAuthenticationMechanism;
 import javax.security.enterprise.authentication.mechanism.http.HttpMessageContext;
@@ -19,12 +19,13 @@ public class AuthMechanism implements HttpAuthenticationMechanism {
     private JwtGenerator generator = new JwtGenerator();
 
     public static final String AUTHORIZATION = "Authorization";
+
     public static final String BEARER = "Bearer ";
 
     @Override
     public AuthenticationStatus validateRequest(HttpServletRequest httpServletRequest,
                                                 HttpServletResponse httpServletResponse,
-                                                HttpMessageContext httpMessageContext) throws AuthenticationException {
+                                                HttpMessageContext httpMessageContext) {
         String header = httpServletRequest.getHeader(AUTHORIZATION);
         Set<String> role = new HashSet<>();
         if (header != null) {

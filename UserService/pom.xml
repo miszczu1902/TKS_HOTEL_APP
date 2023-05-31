@@ -16,7 +16,7 @@
         <module>ApplicationServicePorts</module>
         <module>RestUserAdapter</module>
         <module>SoapAdapter</module>
-        <module>MQAdapter</module>
+        <module>MQUserAdapter</module>
         <module>UserSecurity</module>
     </modules>
 

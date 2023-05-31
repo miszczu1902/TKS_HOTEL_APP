@@ -41,7 +41,7 @@
         </dependency>
         <dependency>
             <groupId>tks.user</groupId>
-            <artifactId>MQAdapter</artifactId>
+            <artifactId>MQUserAdapter</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
