@@ -16,9 +16,6 @@ import java.util.Set;
 @ApplicationScoped
 public class AuthMechanism implements HttpAuthenticationMechanism {
 
-    @Inject
-    private JwtGenerator generator;
-
     public static final String AUTHORIZATION = "Authorization";
 
     public static final String BEARER = "Bearer ";

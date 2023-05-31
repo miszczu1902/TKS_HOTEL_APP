@@ -4,16 +4,25 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jwt.port.JwtPort;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.util.Date;
 
 @ApplicationScoped
-public class JwtGenerator {
+public class JwtGenerator implements JwtPort {
 
-    private static final String SECRET = "f4h9t87t3g473HGufuJ8fFHU4j39j48fmu948cx48cu2j9fj";
-    private static final long timeout = 9000000L;
+    @Inject
+    @ConfigProperty(name = "jwt.secret")
+    private String SECRET;
 
+    @Inject
+    @ConfigProperty(name = "jwt.time")
+    private long timeout;
+
+    @Override
     public String generateJWT(String login, String role) {
         return Jwts.builder()
                 .setSubject(login)
@@ -24,6 +33,7 @@ public class JwtGenerator {
                 .compact();
     }
 
+    @Override
     public Jws<Claims> parseJWT(String jwt) {
         return Jwts.parser()
                 .setSigningKey(SECRET)
