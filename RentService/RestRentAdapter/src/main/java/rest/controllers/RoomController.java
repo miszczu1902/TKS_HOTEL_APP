@@ -7,6 +7,8 @@ import domain.exceptions.RoomException;
 import domain.model.Reservation;
 import domain.model.room.Room;
 import mapper.RestMapper;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 import rest.dto.ReservationForRoomsDto;
 import rest.dto.RoomDto;
 import rest.dto.RoomWithReservationDto;
@@ -23,6 +25,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Path("/rooms")
+@Counted(name = "roomCounter", description = "Room endpoint counter")
+@Timed(name = "roomCallTimer")
 public class RoomController {
 
     @Inject
@@ -30,6 +34,13 @@ public class RoomController {
 
     @Inject
     private RestReservationAdapter restReservationAdapter;
+
+    @GET
+    @PermitAll
+    @Path("/health-check")
+    public Response checkHealthy() {
+        return Response.ok().build();
+    }
 
     @POST
     @RolesAllowed({"ADMIN", "MODERATOR"})

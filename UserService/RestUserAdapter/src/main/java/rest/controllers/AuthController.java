@@ -3,6 +3,8 @@ package rest.controllers;
 import auth.AuthIdentityStore;
 import auth.JwtGenerator;
 import org.eclipse.microprofile.faulttolerance.Retry;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 import rest.dto.LoginDto;
 
 import javax.annotation.security.RolesAllowed;
@@ -20,6 +22,8 @@ import javax.ws.rs.core.SecurityContext;
 
 @Path("/auth")
 @RequestScoped
+@Counted(name = "authCounter", description = "Auth Service counter")
+@Timed(name = "authServiceCallTimer")
 public class AuthController {
 
     @Context

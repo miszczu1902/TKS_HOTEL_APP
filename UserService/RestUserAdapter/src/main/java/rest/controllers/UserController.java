@@ -10,6 +10,7 @@ import domain.model.Role;
 import domain.model.User;
 import mapper.RestMapper;
 import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.jetbrains.annotations.NotNull;
 import rabbit.message.MQProducer;
 import rest.dto.ChangePasswordDto;
@@ -32,7 +33,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Path("/users")
-@Counted(name = "exampleCounter", description = "Example counter")
+@Counted(name = "userServiceCounter", description = "User Service counter")
+@Timed(name = "userServiceCallTimer")
 public class UserController {
 
     @Inject

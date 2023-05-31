@@ -1,0 +1,23 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'user-service-monitor'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['appserver:8080']
+
+  - job_name: 'health'
+    metrics_path: '/health'
+    static_configs:
+      - targets: ['appserver:8080']
+
+  - job_name: 'health-live'
+    metrics_path: '/health/live'
+    static_configs:
+      - targets: ['appserver:8080']
+
+  - job_name: 'health-ready'
+    metrics_path: '/health/ready'
+    static_configs:
+      - targets: ['appserver:8080']

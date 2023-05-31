@@ -8,9 +8,12 @@ import domain.exceptions.ReservationException;
 import domain.model.Reservation;
 import domain.model.room.Room;
 import domain.model.user.User;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 import rest.dto.ReservationDto;
 import rest.dto.ReservationSelfDto;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -23,6 +26,8 @@ import java.net.URI;
 import java.time.LocalDate;
 
 @Path("/reservations")
+@Counted(name = "reservationCounter", description = "Reservation endpoint counter")
+@Timed(name = "reservationCallTimer")
 public class ReservationController {
 
     @Inject
@@ -36,6 +41,13 @@ public class ReservationController {
 
     @Context
     private SecurityContext securityContext;
+
+    @GET
+    @PermitAll
+    @Path("/health-check")
+    public Response checkHealthy() {
+        return Response.ok().build();
+    }
 
     @POST
     @RolesAllowed({"ADMIN", "MODERATOR"})
