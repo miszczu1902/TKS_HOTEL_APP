@@ -2,6 +2,7 @@ package security;
 
 import auth.JwtGenerator;
 import io.jsonwebtoken.Claims;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -19,9 +20,13 @@ public class AuthMechanism implements HttpAuthenticationMechanism {
     @Inject
     private JwtGenerator generator;
 
-    public static final String AUTHORIZATION = "Authorization";
+    @Inject
+    @ConfigProperty(name = "jwt.auth")
+    private String AUTHORIZATION;
 
-    public static final String BEARER = "Bearer ";
+    @Inject
+    @ConfigProperty(name = "jwt.bearer")
+    private String BEARER;
 
     @Override
     public AuthenticationStatus validateRequest(HttpServletRequest httpServletRequest,

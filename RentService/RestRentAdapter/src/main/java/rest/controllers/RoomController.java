@@ -37,7 +37,7 @@ public class RoomController {
     private final Logger log = Logger.getLogger(getClass().getName());
 
     @POST
-//    @RolesAllowed({"ADMIN", "MODERATOR"})
+    @RolesAllowed({"ADMIN", "MODERATOR"})
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addRoom(@Valid RoomDto room) {
         try {
@@ -54,7 +54,7 @@ public class RoomController {
     }
 
     @GET
-//    @PermitAll
+    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllRooms() {
         return Response.ok().entity(restRoomAdapter.getAllRooms().stream()
@@ -63,7 +63,7 @@ public class RoomController {
 
     @GET
     @Path("/{roomNumber}")
-//    @RolesAllowed({"ADMIN", "MODERATOR", "USER"})
+    @RolesAllowed({"ADMIN", "MODERATOR", "USER"})
     @Produces(MediaType.APPLICATION_JSON)
     public Response getRoom(@PathParam("roomNumber") int roomNumber) {
         try {
@@ -75,7 +75,7 @@ public class RoomController {
     }
 
     @PUT
-//    @RolesAllowed({"ADMIN", "MODERATOR"})
+    @RolesAllowed({"ADMIN", "MODERATOR"})
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateRoom(@Valid RoomDto room) {
         try {
@@ -98,7 +98,7 @@ public class RoomController {
     }
 
     @DELETE
-//    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN"})
     @Path("/{roomNumber}")
     public Response removeRoom(@PathParam("roomNumber") int roomNumber) {
         try {
@@ -114,7 +114,7 @@ public class RoomController {
 
     @GET
     @Path("/{roomNumber}/reservations")
-//    @RolesAllowed({"ADMIN", "MODERATOR"})
+    @RolesAllowed({"ADMIN", "MODERATOR"})
     @Produces(MediaType.APPLICATION_JSON)
     public Response getRoomWithReservations(@PathParam("roomNumber") int roomNumber) {
         try {

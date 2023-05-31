@@ -16,7 +16,7 @@ import java.util.*;
 public class AuthIdentityStore implements IdentityStore {
 
     @Inject
-    private UserInfServicePort restUserAdapter;
+    private UserInfServicePort userInfServicePort;
 
     @Context
     private SecurityContext securityContext;
@@ -33,13 +33,13 @@ public class AuthIdentityStore implements IdentityStore {
 
     @Override
     public Set<String> getCallerGroups(CredentialValidationResult validationResult) {
-        User user = new ArrayList<>(restUserAdapter.getAllUsers().stream().filter(user1 -> user1.getUsername().equals(
+        User user = new ArrayList<>(userInfServicePort.getAllUsers().stream().filter(user1 -> user1.getUsername().equals(
                 validationResult.getCallerPrincipal().getName())).toList()).get(0);
         return new HashSet<>(Collections.singleton(user.getRole().toString()));
     }
 
     public CredentialValidationResult validate(UsernamePasswordCredential credential) {
-        User user = restUserAdapter.getByUsernameAndPassword(credential.getCaller(),
+        User user = userInfServicePort.getByUsernameAndPassword(credential.getCaller(),
                 credential.getPasswordAsString());
         if (user != null && user.getIsActive()) {
             return new CredentialValidationResult(user.getUsername(), new HashSet<>(Collections.singleton(user.getRole().toString())));

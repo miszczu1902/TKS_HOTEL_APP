@@ -16,6 +16,7 @@
     <module>ApplicationServicePorts</module>
     <module>RestRentAdapter</module>
     <module>MQRentAdapter</module>
+      <module>RentSecurity</module>
   </modules>
 
   <dependencyManagement>

@@ -1,7 +1,8 @@
 package security;
 
-import auth.JwtGenerator;
 import io.jsonwebtoken.Claims;
+import jwt.JWTParser;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -16,9 +17,16 @@ import java.util.Set;
 @ApplicationScoped
 public class AuthMechanism implements HttpAuthenticationMechanism {
 
-    public static final String AUTHORIZATION = "Authorization";
+    @Inject
+    private JWTParser parser;
 
-    public static final String BEARER = "Bearer ";
+    @Inject
+    @ConfigProperty(name = "jwt.auth")
+    private String AUTHORIZATION;
+
+    @Inject
+    @ConfigProperty(name = "jwt.bearer")
+    private String BEARER;
 
     @Override
     public AuthenticationStatus validateRequest(HttpServletRequest httpServletRequest,
@@ -30,15 +38,16 @@ public class AuthMechanism implements HttpAuthenticationMechanism {
             if (header.startsWith(BEARER)) {
                 try {
                     String token = header.replace(BEARER, "");
-                    Claims claims = generator.parseJWT(token).getBody();
+                    Claims claims = parser.parseJWT(token).getBody();
                     role.add(claims.get("role", String.class));
                     return httpMessageContext.notifyContainerAboutLogin(claims.getSubject(), role);
                 } catch (Exception e) {
                     return httpMessageContext.responseUnauthorized();
                 }
             }
+        } else {
+            role.add("GUEST");
         }
-        role.add("GUEST");
         return httpMessageContext.notifyContainerAboutLogin("guest", role);
     }
 }
