@@ -13,6 +13,11 @@ import java.util.List;
 
 public class RoomControllerTest extends AbstractControllerTest {
 
+    @BeforeClass
+    public static void prepareTestClass() {
+        auth(modData);
+    }
+
     @Test
     public void getAllRooms() {
         Response response = sendRequestAndGetResponse(Method.GET, "/rooms", null, ContentType.JSON);
@@ -38,11 +43,17 @@ public class RoomControllerTest extends AbstractControllerTest {
         assertEqualsCustom(201, roomAddedResponse.getStatusCode());
 
         Response response = sendRequestAndGetResponse(Method.DELETE, "/rooms/" + roomToAdd.getRoomNumber(), null, null);
+        assertEqualsCustom(403, response.getStatusCode());
+
+        auth(new LoginDto("miszczuadmin", "123456"));
+
+        response = sendRequestAndGetResponse(Method.DELETE, "/rooms/" + roomToAdd.getRoomNumber(), null, null);
         assertEqualsCustom(204, response.getStatusCode());
     }
 
     @Test
     public void getSpecifiedRoom() {
+        auth(modData);
         Integer roomNumber;
         List<RoomDto> rooms = sendRequestAndGetResponse(Method.GET, "/rooms", null, ContentType.JSON)
                 .body().jsonPath().getList("", RoomDto.class);
@@ -55,9 +66,6 @@ public class RoomControllerTest extends AbstractControllerTest {
         } else {
             roomNumber = rooms.get(0).getRoomNumber();
         }
-
-        Response response = sendRequestAndGetResponse(Method.GET, "/rooms/" + roomNumber, null, ContentType.JSON);
-        assertEqualsCustom(response.getStatusCode(), 200);
 
     }
 

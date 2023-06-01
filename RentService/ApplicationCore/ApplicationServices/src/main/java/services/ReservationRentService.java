@@ -10,6 +10,7 @@ import domain.exceptions.RoomException;
 import domain.exceptions.UserException;
 import domain.model.Reservation;
 import domain.model.room.Room;
+import domain.model.user.User;
 import service.port.control.ReservationRentControlServicePort;
 import service.port.infrasturcture.ReservationRentInfServicePort;
 
@@ -58,24 +59,30 @@ public class ReservationRentService implements ReservationRentInfServicePort, Re
             Room room = roomRentInfPort.get(roomNumber);
             String username = reservation.getUser().getUsername();
 
-            if (userRentInfPort.get(username) != null) {
-                LocalDate beginTime = LocalDate.parse(reservation.getBeginTime().toString());
-                LocalDate endTime = LocalDate.parse(reservation.getEndTime().toString());
-                LocalDate now = LocalDate.now();
+            User user = userRentInfPort.get(username);
 
-                if (beginTime.isAfter(endTime) || endTime.isBefore(beginTime)) {
-                    log.warning("Start time of reservation %s should be before end time reservation %s".formatted(beginTime, endTime));
-                    throw new ReservationException("Start time of reservation should be before end time reservation");
-                } else if (beginTime.isBefore(now) || endTime.isBefore(now)) {
-                    log.warning("Reservation with start time %s cannot be before current date %s".formatted(now, beginTime));
-                    throw new ReservationException("Reservation cannot be before current date");
-                } else if (checkIfRoomCantBeReserved(roomNumber, beginTime)) {
-                    log.warning("Room %s is currently reserved".formatted(roomNumber));
-                    throw new RoomException("Room is currently reserved");
+            if (user != null) {
+                if (user.getIsActive()) {
+                    LocalDate beginTime = LocalDate.parse(reservation.getBeginTime().toString());
+                    LocalDate endTime = LocalDate.parse(reservation.getEndTime().toString());
+                    LocalDate now = LocalDate.now();
+
+                    if (beginTime.isAfter(endTime) || endTime.isBefore(beginTime)) {
+                        log.warning("Start time of reservation %s should be before end time reservation %s".formatted(beginTime, endTime));
+                        throw new ReservationException("Start time of reservation should be before end time reservation");
+                    } else if (beginTime.isBefore(now) || endTime.isBefore(now)) {
+                        log.warning("Reservation with start time %s cannot be before current date %s".formatted(now, beginTime));
+                        throw new ReservationException("Reservation cannot be before current date");
+                    } else if (checkIfRoomCantBeReserved(roomNumber, beginTime)) {
+                        log.warning("Room %s is currently reserved".formatted(roomNumber));
+                        throw new RoomException("Room is currently reserved");
+                    } else {
+                        Reservation newReservation = new Reservation(room, beginTime, endTime, userRentInfPort.get(username));
+                        newReservation.calculateReservationCost();
+                        reservationRentControlPort.add(newReservation);
+                    }
                 } else {
-                    Reservation newReservation = new Reservation(room, beginTime, endTime, userRentInfPort.get(username));
-                    newReservation.calculateReservationCost();
-                    reservationRentControlPort.add(newReservation);
+                    throw new ReservationException("Client is not active");
                 }
             } else {
                 throw new UserException("Client is not active");

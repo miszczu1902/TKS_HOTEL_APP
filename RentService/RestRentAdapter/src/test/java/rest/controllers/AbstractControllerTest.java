@@ -20,6 +20,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -29,6 +30,7 @@ import rest.dto.GetUserDto;
 import rest.dto.LoginDto;
 
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Optional;
 
 import static io.restassured.RestAssured.baseURI;
@@ -62,11 +64,14 @@ public abstract class AbstractControllerTest {
     private static GenericContainer<?> PAYARA = new GenericContainer<>(PAYARA_IMAGE)
             .withLogConsumer(new Slf4jLogConsumer(logger))
             .withExposedPorts(8080)
+//            .withFileSystemBind(
+//                    "/home/miszczu/Pulpit/TKS/UserService/RestUserService/target/RestUserAdapter-1.0-SNAPSHOT.war",
+//                    "/opt/payara/deployments/RestUserAdapter-1.0-SNAPSHOT.war")
             .withCopyFileToContainer(
-                    MountableFile.forHostPath(Paths.get("target/RentService.war").toAbsolutePath()),
-                    "/opt/payara/deployments/RentService.war")
+                    MountableFile.forHostPath(Paths.get("target/RestRentAdapter-1.0-SNAPSHOT.war").toAbsolutePath()),
+                    "/opt/payara/deployments/RestRentAdapter-1.0-SNAPSHOT.war")
             .dependsOn(POSTGRES)
-            .waitingFor(Wait.forLogMessage(".*was successfully deployed in.*", 1));
+            .waitingFor(new HttpWaitStrategy().forPath("/health").forStatusCode(503));
 
     @Setter
     protected static String bearerToken = "";
@@ -81,6 +86,7 @@ public abstract class AbstractControllerTest {
     @BeforeClass
     public static void prepareRestAssured() {
         try (Network network = Network.newNetwork()) {
+//            logger.info("INFO PATH: " + MountableFile.forHostPath(Paths.get("UserService/RestUserService/target/RestUserAdapter-1.0-SNAPSHOT.war")).getFilesystemPath());
             POSTGRES.withNetwork(network).withNetworkAliases("databaseRent");
             PAYARA.withNetwork(network).withNetworkAliases("appserver");
 

@@ -20,6 +20,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
@@ -61,10 +62,10 @@ public abstract sealed class AbstractControllerTest permits UserControllerTest {
             .withLogConsumer(new Slf4jLogConsumer(logger))
             .withExposedPorts(8080)
             .withCopyFileToContainer(
-                    MountableFile.forHostPath(Paths.get("target/UserService.war").toAbsolutePath()),
-                    "/opt/payara/deployments/UserService.war")
+                    MountableFile.forHostPath(Paths.get("target/RestUserAdapter-1.0-SNAPSHOT.war").toAbsolutePath()),
+                    "/opt/payara/deployments/RestUserAdapter-1.0-SNAPSHOT.war")
             .dependsOn(POSTGRES)
-            .waitingFor(Wait.forLogMessage(".*was successfully deployed in.*", 1));
+            .waitingFor(new HttpWaitStrategy().forPath("/health").forStatusCode(503));
 
     @Setter
     protected static String bearerToken = "";
@@ -98,6 +99,7 @@ public abstract sealed class AbstractControllerTest permits UserControllerTest {
             RestAssured.config = RestAssured.config().objectMapperConfig(new ObjectMapperConfig().jackson2ObjectMapperFactory(
                     (cls, charset) -> mapper
             ));
+            while (true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
