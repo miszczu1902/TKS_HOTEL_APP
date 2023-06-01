@@ -17,4 +17,12 @@ public class UserEnt implements Serializable {
     @NotNull
     @Column(name = "username", nullable = false)
     private String username;
+
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive;
+
+    public UserEnt(@NonNull String username) {
+        this.username = username;
+        this.isActive = true;
+    }
 }

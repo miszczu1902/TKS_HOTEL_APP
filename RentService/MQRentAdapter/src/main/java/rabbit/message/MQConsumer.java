@@ -9,6 +9,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import rabbit.event.UserCreatedEvent;
 import rabbit.exceptions.MQException;
 import service.port.control.UserRentControlServicePort;
+import service.port.infrasturcture.UserRentInfServicePort;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -31,6 +32,9 @@ public class MQConsumer {
 
     @Inject
     private UserRentControlServicePort userControlServicePort;
+
+    @Inject
+    private UserRentInfServicePort userRentInfServicePort;
 
     @PostConstruct
     public void initConsumer(@Observes @Initialized(ApplicationScoped.class) Object init) {
@@ -63,9 +67,11 @@ public class MQConsumer {
                 throw new MQException("Error during creating client");
             }
 
-        } else {
+        } else if (clientCreatedEvent.getIsModified()) {
+            User user = userRentInfServicePort.getUser(clientCreatedEvent.getUsername());
+            user.setIsActive(clientCreatedEvent.getIsActive());
             try {
-                userControlServicePort.updateUser(new User(clientCreatedEvent.getUsername()));
+                userControlServicePort.updateUser(user);
             } catch (UserException e) {
                 throw new MQException("Error during updating client");
             }

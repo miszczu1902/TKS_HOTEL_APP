@@ -10,4 +10,10 @@ import java.io.Serializable;
 public class User implements Serializable {
     @NonNull
     private String username;
+    private Boolean isActive;
+
+    public User(@NonNull String username) {
+        this.username = username;
+        this.isActive = true;
+    }
 }

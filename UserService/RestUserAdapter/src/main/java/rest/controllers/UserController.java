@@ -12,6 +12,7 @@ import mapper.RestMapper;
 import org.eclipse.microprofile.metrics.annotation.Counted;
 import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.jetbrains.annotations.NotNull;
+import rabbit.event.UserCreatedEvent;
 import rabbit.message.MQProducer;
 import rest.dto.ChangePasswordDto;
 import rest.dto.CreateUserDto;
@@ -153,6 +154,7 @@ public class UserController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response activateUser(@PathParam("username") String username) throws UserException {
         restUserAdapter.activateUser(username);
+        producer.produce(new UserCreatedEvent(username, true, true));
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
@@ -162,6 +164,7 @@ public class UserController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deactivateUser(@PathParam("username") String username) throws UserException {
         restUserAdapter.deactivateUser(username);
+        producer.produce(new UserCreatedEvent(username, false, true));
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 

@@ -11,6 +11,7 @@ import lombok.NonNull;
 public class UserCreatedEvent {
     @NonNull
     private String username;
+    private Boolean isActive;
 
     private Boolean isModified;
     private Boolean isCreated;
@@ -19,5 +20,13 @@ public class UserCreatedEvent {
         this.username = username;
         this.isModified = false;
         this.isCreated = true;
+        this.isActive = true;
+    }
+
+    public UserCreatedEvent(@NonNull String username, Boolean isActive, Boolean isModified) {
+        this.username = username;
+        this.isActive = isActive;
+        this.isModified = isModified;
+        this.isCreated = false;
     }
 }

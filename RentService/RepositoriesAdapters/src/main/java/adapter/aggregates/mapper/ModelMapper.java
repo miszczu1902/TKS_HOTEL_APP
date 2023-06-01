@@ -1,7 +1,6 @@
 package adapter.aggregates.mapper;
 
 import adapter.model.ReservationEnt;
-import adapter.model.RoleEnt;
 import adapter.model.room.EquipmentTypeEnt;
 import adapter.model.room.RoomEnt;
 import adapter.model.user.UserEnt;
@@ -50,7 +49,7 @@ public class ModelMapper {
 
     public static UserEnt userToUserEnt(User user) {
         try {
-            return new UserEnt(user.getUsername());
+            return new UserEnt(user.getUsername(), user.getIsActive());
         } catch (NullPointerException e) {
             throw new NoSuchElementException(e);
         }
@@ -58,7 +57,7 @@ public class ModelMapper {
 
     public static User userEntToUser(UserEnt userEnt) {
         try {
-            return new User(userEnt.getUsername());
+            return new User(userEnt.getUsername(), userEnt.getIsActive());
         } catch (NullPointerException e) {
             throw new NoSuchElementException(e);
         }
