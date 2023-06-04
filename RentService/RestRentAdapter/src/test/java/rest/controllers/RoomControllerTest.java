@@ -67,6 +67,9 @@ public class RoomControllerTest extends AbstractControllerTest {
             roomNumber = rooms.get(0).getRoomNumber();
         }
 
+        Response response = sendRequestAndGetResponse(Method.GET, "/rooms/" + roomNumber, null, null);
+        assertEqualsCustom(response.getStatusCode(), 200);
+
     }
 
 }

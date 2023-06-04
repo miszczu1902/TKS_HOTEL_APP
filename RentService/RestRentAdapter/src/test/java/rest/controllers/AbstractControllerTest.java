@@ -20,17 +20,14 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
-import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
-import rest.dto.GetUserDto;
 import rest.dto.LoginDto;
 
+import java.io.File;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.Optional;
 
 import static io.restassured.RestAssured.baseURI;
@@ -38,7 +35,6 @@ import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Testcontainers
 public abstract class AbstractControllerTest {
 
     /* Images */
@@ -46,44 +42,43 @@ public abstract class AbstractControllerTest {
     private static final DockerImageName POSTGRES_IMAGE = DockerImageName.parse("postgres:latest");
     private static final DockerImageName RABBIT_IMAGE = DockerImageName.parse("bitnami/rabbitmq:latest");
 
+    private static final String warRentFilePath = "../RestRentAdapter/target/RestRentAdapter-1.0-SNAPSHOT.war";
+    private static final String warUserFilePath = "../../UserService/RestUserAdapter/target/RestUserAdapter-1.0-SNAPSHOT.war";
+    private static final String rabbitInitFile = "../RestRentAdapter/src/test/resources/create_users.sh";
+
     /* Network and ports */
     protected static int POSTGRES_PORT;
     protected static int PAYARA_PORT;
-    protected static int RABBIT_PORT;
 
     private static final Logger logger = LoggerFactory.getLogger("testcontainers-config");
 
+
     /* Containers */
     @Container
-    private static PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>(POSTGRES_IMAGE)
+    private static PostgreSQLContainer<?> POSTGRES_USER = new PostgreSQLContainer<>(POSTGRES_IMAGE)
             .withLogConsumer(new Slf4jLogConsumer(logger))
             .withDatabaseName("nbddb")
             .withUsername("nbd")
             .withPassword("nbdpassword")
             .withExposedPorts(5432);
-
     @Container
-    private static GenericContainer<?> PAYARA = new GenericContainer<>(PAYARA_IMAGE)
+    private static PostgreSQLContainer<?> POSTGRES_RENT = new PostgreSQLContainer<>(POSTGRES_IMAGE)
             .withLogConsumer(new Slf4jLogConsumer(logger))
-            .withExposedPorts(8080)
-//            .withCopyFileToContainer(
-//                    MountableFile.forHostPath(Paths.get("../../RestUserAdapter/target/RestUserAdapter-1.0-SNAPSHOT.war").toAbsolutePath(), 0777),
-//                    "/opt/payara/deployments/RestUserAdapter-1.0-SNAPSHOT.war")
-            .withCopyFileToContainer(
-                    MountableFile.forHostPath(Paths.get("target/RestRentAdapter-1.0-SNAPSHOT.war").toAbsolutePath(), 0777),
-                    "/opt/payara/deployments/RestRentAdapter-1.0-SNAPSHOT.war")
-            .dependsOn(POSTGRES)
-            .waitingFor(Wait.forHttp("/rent/api/rooms/health-check"));
-
+            .withDatabaseName("nbddb")
+            .withUsername("nbd")
+            .withPassword("nbdpassword")
+            .withExposedPorts(5432)
+            .dependsOn(POSTGRES_USER);
 
     @Container
     private static GenericContainer<?> RABBIT = new GenericContainer<>(RABBIT_IMAGE)
             .withLogConsumer(new Slf4jLogConsumer(logger))
-            .withExposedPorts(5672)
-            .withCopyFileToContainer(
-                    MountableFile.forHostPath(Paths.get("test/resources/create_users.sh").toAbsolutePath(), 0777),
-                    "/docker-entrypoint-initdb.d/create_users.sh")
-            .dependsOn(PAYARA);
+            .withExposedPorts(5672, 15672);
+
+    @Container
+    private static GenericContainer<?> PAYARA = new GenericContainer<>(PAYARA_IMAGE)
+            .withLogConsumer(new Slf4jLogConsumer(logger))
+            .withExposedPorts(8080, 4848);
 
     @Setter
     protected static String bearerToken = "";
@@ -92,26 +87,44 @@ public abstract class AbstractControllerTest {
     protected static final LoginDto modData = new LoginDto("miszczumod", "123456");
     protected static final LoginDto userData = new LoginDto("miszczu", "123456");
 
-    protected static GetUserDto user;
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeClass
     public static void prepareRestAssured() {
         try (Network network = Network.newNetwork()) {
-            POSTGRES.withNetwork(network).withNetworkAliases("databaseRent");
-            PAYARA.withNetwork(network).withNetworkAliases("appserver");
-            RABBIT.withNetwork(network).withNetworkAliases("rabbit");
+            RABBIT.withCopyFileToContainer(
+                            MountableFile.forHostPath(Paths.get(new File(rabbitInitFile).getCanonicalPath()).toAbsolutePath(), 0777),
+                            "/docker-entrypoint-initdb.d/create_users.sh")
+                    .waitingFor(Wait.forLogMessage(".*Starting broker... completed with 3 plugins.*", 1))
+                    .dependsOn(POSTGRES_RENT);
+            PAYARA.withCopyFileToContainer(
+                            MountableFile.forHostPath(Paths.get(new File(warUserFilePath).getCanonicalPath()).toAbsolutePath(), 0777),
+                            "/opt/payara/deployments/RestUserAdapter-1.0-SNAPSHOT.war")
+                    .withCopyFileToContainer(
+                            MountableFile.forHostPath(Paths.get(new File(warRentFilePath).getCanonicalPath()).toAbsolutePath(), 0777),
+                            "/opt/payara/deployments/RestRentAdapter-1.0-SNAPSHOT.war")
+                    .dependsOn(RABBIT)
+                    .waitingFor(Wait.forHttp("/rent/api/rooms/health-check"));
 
-            POSTGRES.start();
-            POSTGRES_PORT = POSTGRES.getMappedPort(5432);
+            POSTGRES_USER.withNetwork(network).withNetworkAliases("databaseUser");
+            POSTGRES_RENT.withNetwork(network).withNetworkAliases("databaseRent");
+            PAYARA.withNetwork(network).withNetworkAliases("appserver");
+            RABBIT.withNetwork(network).withNetworkAliases("rabbitmq");
+
+            POSTGRES_USER.start();
+            POSTGRES_PORT = POSTGRES_USER.getMappedPort(5432);
+            POSTGRES_RENT.start();
+
+            RABBIT.start();
+
             PAYARA.start();
             PAYARA_PORT = PAYARA.getMappedPort(8080);
-            RABBIT.start();
-            RABBIT_PORT = RABBIT.getMappedPort(5672);
 
-            logger.info("Postgres port: " + POSTGRES_PORT);
+            logger.info("Postgres UserService port: " + POSTGRES_PORT);
+            logger.info("Postgres RentService port: " + POSTGRES_RENT.getMappedPort(5432));
             logger.info("Payara port: " + PAYARA_PORT);
-            logger.info("Rabbit port: " + PAYARA_PORT);
+            logger.info("Payara admin port: " + PAYARA.getMappedPort(4848));
+            logger.info("Rabbit console port: " + RABBIT.getMappedPort(15672));
 
             RestAssured.baseURI = "http://localhost:" + PAYARA_PORT + "/rent/api";
             RestAssured.port = PAYARA_PORT;
@@ -130,8 +143,12 @@ public abstract class AbstractControllerTest {
     public static void endTestAndStopContainers() {
         PAYARA.stop();
         logger.info("Payara container stopped.");
-        POSTGRES.stop();
-        logger.info("Postgres container stopped.");
+        RABBIT.stop();
+        logger.info("RabbitMQ container stooped.");
+        POSTGRES_RENT.stop();
+        logger.info("Postgres Rent container stopped.");
+        POSTGRES_USER.stop();
+        logger.info("Postgres USER container stopped.");
     }
 
     protected static Response sendRequestAndGetResponse(Method method, String path, String jsonBody, ContentType contentType) {
@@ -158,19 +175,11 @@ public abstract class AbstractControllerTest {
     }
 
     protected static void auth(LoginDto loginData) {
+        RestAssured.baseURI = "http://localhost:" + PAYARA_PORT + "/user/api";
         bearerToken = sendRequestAndGetResponse(Method.POST, "/auth/login", objectToJson(loginData), ContentType.JSON)
                 .getBody().asString();
-        user = sendRequestAndGetResponse(Method.GET, "/users/" + loginData.getUsername(), null, null)
-                .getBody()
-                .as(GetUserDto.class);
-    }
+        RestAssured.baseURI = "http://localhost:" + PAYARA_PORT + "/rent/api";
 
-    private static void logMetaData(Method method, String path, ContentType contentType) {
-        String logData = "Method: " + method.toString() + "\n" +
-                "Path: " + baseURI + path + "\n" +
-                "Content-Type: " + Optional.ofNullable(contentType.toString()).orElse("") + "\n" +
-                "Authorization: " + bearerToken + "\n";
-        logger.info(logData);
     }
 
     protected static void logBeforeRequest(Method method, String path, String jsonBody, ContentType contentType) {
@@ -189,6 +198,14 @@ public abstract class AbstractControllerTest {
         } else {
             assertEquals(expected, actual);
         }
+    }
+
+    private static void logMetaData(Method method, String path, ContentType contentType) {
+        String logData = "Method: " + method.toString() + "\n" +
+                "Path: " + baseURI + path + "\n" +
+                "Content-Type: " + Optional.ofNullable(contentType.toString()).orElse("") + "\n" +
+                "Authorization: " + bearerToken + "\n";
+        logger.info(logData);
     }
 
 }

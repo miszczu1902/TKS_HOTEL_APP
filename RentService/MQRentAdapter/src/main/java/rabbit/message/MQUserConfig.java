@@ -5,9 +5,10 @@ import com.rabbitmq.client.Connection;
 import rabbit.exceptions.MQException;
 import rabbit.factory.MQConnectionFactory;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Initialized;
+import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import java.io.IOException;
@@ -27,8 +28,7 @@ public class MQUserConfig {
         return connection.createChannel();
     }
 
-    @PostConstruct
-    public void afterCreate() {
+    public void afterCreate(@Observes @Initialized(ApplicationScoped.class) Object init) {
         connection = connectionFactory.createConnection();
     }
 

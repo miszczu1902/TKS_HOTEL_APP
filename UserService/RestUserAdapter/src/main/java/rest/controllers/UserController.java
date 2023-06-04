@@ -9,10 +9,12 @@ import domain.exceptions.UserException;
 import domain.model.Role;
 import domain.model.User;
 import mapper.RestMapper;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.metrics.annotation.Counted;
 import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.jetbrains.annotations.NotNull;
 import rabbit.event.UserCreatedEvent;
+import rabbit.exceptions.MQException;
 import rabbit.message.MQProducer;
 import rest.dto.ChangePasswordDto;
 import rest.dto.CreateUserDto;
@@ -24,6 +26,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.security.enterprise.SecurityContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -31,6 +34,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Path("/users")
@@ -58,6 +62,7 @@ public class UserController {
     }
 
     @GET
+    @Retry(delay = 100, maxDuration = 1000, jitter = 100, maxRetries = 5)
     @PermitAll
     @Path("/{username}/jws")
     public Response getJws(@PathParam("username") String username) throws JOSEException {
@@ -66,6 +71,7 @@ public class UserController {
     }
 
     @GET
+    @Retry(delay = 100, maxDuration = 1000, jitter = 100, maxRetries = 5)
     @RolesAllowed({"ADMIN", "MODERATOR"})
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers() {
@@ -81,6 +87,7 @@ public class UserController {
     }
 
     @GET
+    @Retry(delay = 100, maxDuration = 1000, jitter = 100, maxRetries = 5)
     @Path("/clients")
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"ADMIN", "MODERATOR"})
@@ -92,6 +99,7 @@ public class UserController {
     }
 
     @GET
+    @Retry(delay = 100, maxDuration = 1000, jitter = 100, maxRetries = 5)
     @Path("/user")
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"ADMIN", "MODERATOR"})
@@ -108,6 +116,7 @@ public class UserController {
     }
 
     @GET
+    @Retry(delay = 100, maxDuration = 1000, jitter = 100, maxRetries = 5)
     @Path("/{username}")
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"ADMIN", "MODERATOR", "USER"})
@@ -121,6 +130,7 @@ public class UserController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("GUEST")
+    @Transactional(dontRollbackOn = NoSuchElementException.class, rollbackOn = MQException.class)
     public Response addUser(@Valid CreateUserDto user) throws UserException {
         restUserAdapter.addUser(RestMapper.createUserDtoToUser(user));
         producer.produce(RestMapper.createUserDtoToUserCreatedEvent(user));
@@ -151,6 +161,7 @@ public class UserController {
     @POST
     @Path("/{username}/activate")
     @RolesAllowed({"ADMIN"})
+    @Transactional(dontRollbackOn = NoSuchElementException.class, rollbackOn = MQException.class)
     @Produces(MediaType.APPLICATION_JSON)
     public Response activateUser(@PathParam("username") String username) throws UserException {
         restUserAdapter.activateUser(username);
@@ -161,6 +172,7 @@ public class UserController {
     @POST
     @RolesAllowed({"ADMIN"})
     @Path("/{username}/deactivate")
+    @Transactional(dontRollbackOn = NoSuchElementException.class, rollbackOn = MQException.class)
     @Produces(MediaType.APPLICATION_JSON)
     public Response deactivateUser(@PathParam("username") String username) throws UserException {
         restUserAdapter.deactivateUser(username);

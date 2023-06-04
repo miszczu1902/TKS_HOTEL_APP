@@ -36,7 +36,7 @@ import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public abstract sealed class AbstractControllerTest permits UserControllerTest {
+public abstract class AbstractControllerTest  {
 
     /* Images */
     private static final DockerImageName PAYARA_IMAGE = DockerImageName.parse("payara/server-full:5.2022.4-jdk17");
@@ -130,6 +130,8 @@ public abstract sealed class AbstractControllerTest permits UserControllerTest {
     public static void endTestAndStopContainers() {
         PAYARA.stop();
         logger.info("Payara container stopped.");
+        RABBIT.stop();
+        logger.info("RabbitMQ container stopped.");
         POSTGRES.stop();
         logger.info("Postgres container stopped.");
     }

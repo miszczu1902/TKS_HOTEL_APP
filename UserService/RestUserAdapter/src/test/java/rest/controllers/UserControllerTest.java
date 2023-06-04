@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public final class UserControllerTest extends AbstractControllerTest {
+public class UserControllerTest extends AbstractControllerTest {
 
     @Test
     public void getAllUsers() {

@@ -20,7 +20,7 @@ public class UserEnt implements Serializable {
     @Id
     @NonNull
     @NotNull
-    @Column(name = "username", nullable = false)
+    @Column(name = "username", nullable = false, updatable = false)
     private String username;
 
     @NonNull
