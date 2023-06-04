@@ -11,7 +11,6 @@ import rabbit.exceptions.MQException;
 import service.port.control.UserRentControlServicePort;
 import service.port.infrasturcture.UserRentInfServicePort;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
 import javax.enterprise.event.Observes;
@@ -36,7 +35,6 @@ public class MQConsumer {
     @Inject
     private UserRentInfServicePort userRentInfServicePort;
 
-    @PostConstruct
     public void initConsumer(@Observes @Initialized(ApplicationScoped.class) Object init) {
         if (channel == null)
             throw new MQException("Error during initializing producer, connection is not established");

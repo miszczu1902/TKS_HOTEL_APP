@@ -44,10 +44,12 @@ public abstract class AbstractControllerTest {
     /* Images */
     private static final DockerImageName PAYARA_IMAGE = DockerImageName.parse("payara/server-full:5.2022.4-jdk17");
     private static final DockerImageName POSTGRES_IMAGE = DockerImageName.parse("postgres:latest");
+    private static final DockerImageName RABBIT_IMAGE = DockerImageName.parse("bitnami/rabbitmq:latest");
 
     /* Network and ports */
     protected static int POSTGRES_PORT;
     protected static int PAYARA_PORT;
+    protected static int RABBIT_PORT;
 
     private static final Logger logger = LoggerFactory.getLogger("testcontainers-config");
 
@@ -64,14 +66,24 @@ public abstract class AbstractControllerTest {
     private static GenericContainer<?> PAYARA = new GenericContainer<>(PAYARA_IMAGE)
             .withLogConsumer(new Slf4jLogConsumer(logger))
             .withExposedPorts(8080)
-//            .withFileSystemBind(
-//                    "/home/miszczu/Pulpit/TKS/UserService/RestUserService/target/RestUserAdapter-1.0-SNAPSHOT.war",
+//            .withCopyFileToContainer(
+//                    MountableFile.forHostPath(Paths.get("../../RestUserAdapter/target/RestUserAdapter-1.0-SNAPSHOT.war").toAbsolutePath(), 0777),
 //                    "/opt/payara/deployments/RestUserAdapter-1.0-SNAPSHOT.war")
             .withCopyFileToContainer(
-                    MountableFile.forHostPath(Paths.get("target/RestRentAdapter-1.0-SNAPSHOT.war").toAbsolutePath()),
+                    MountableFile.forHostPath(Paths.get("target/RestRentAdapter-1.0-SNAPSHOT.war").toAbsolutePath(), 0777),
                     "/opt/payara/deployments/RestRentAdapter-1.0-SNAPSHOT.war")
             .dependsOn(POSTGRES)
-            .waitingFor(new HttpWaitStrategy().forPath("/health").forStatusCode(503));
+            .waitingFor(Wait.forHttp("/rent/api/rooms/health-check"));
+
+
+    @Container
+    private static GenericContainer<?> RABBIT = new GenericContainer<>(RABBIT_IMAGE)
+            .withLogConsumer(new Slf4jLogConsumer(logger))
+            .withExposedPorts(5672)
+            .withCopyFileToContainer(
+                    MountableFile.forHostPath(Paths.get("test/resources/create_users.sh").toAbsolutePath(), 0777),
+                    "/docker-entrypoint-initdb.d/create_users.sh")
+            .dependsOn(PAYARA);
 
     @Setter
     protected static String bearerToken = "";
@@ -86,17 +98,20 @@ public abstract class AbstractControllerTest {
     @BeforeClass
     public static void prepareRestAssured() {
         try (Network network = Network.newNetwork()) {
-//            logger.info("INFO PATH: " + MountableFile.forHostPath(Paths.get("UserService/RestUserService/target/RestUserAdapter-1.0-SNAPSHOT.war")).getFilesystemPath());
             POSTGRES.withNetwork(network).withNetworkAliases("databaseRent");
             PAYARA.withNetwork(network).withNetworkAliases("appserver");
+            RABBIT.withNetwork(network).withNetworkAliases("rabbit");
 
             POSTGRES.start();
             POSTGRES_PORT = POSTGRES.getMappedPort(5432);
             PAYARA.start();
             PAYARA_PORT = PAYARA.getMappedPort(8080);
+            RABBIT.start();
+            RABBIT_PORT = RABBIT.getMappedPort(5672);
 
             logger.info("Postgres port: " + POSTGRES_PORT);
             logger.info("Payara port: " + PAYARA_PORT);
+            logger.info("Rabbit port: " + PAYARA_PORT);
 
             RestAssured.baseURI = "http://localhost:" + PAYARA_PORT + "/rent/api";
             RestAssured.port = PAYARA_PORT;
