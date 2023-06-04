@@ -61,6 +61,8 @@ services:
     extra_hosts:
       - "databaseRent:172.55.0.4"
       - "databaseUser:172.55.0.3"
+      - "rabbitmq:172.55.0.5"
+      - "appserver:172.55.0.2"
     networks:
       tks:
         ipv4_address: 172.55.0.2

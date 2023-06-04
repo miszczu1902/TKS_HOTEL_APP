@@ -7,12 +7,13 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeoutException;
 
 @ApplicationScoped
 public class MQConnectionFactory {
     @Inject
-    @ConfigProperty(name = "rabbit.hostname", defaultValue = "172.55.0.5")
+    @ConfigProperty(name = "rabbit.hostname", defaultValue = "rabbitmq")
     private String hostname;
 
     @Inject

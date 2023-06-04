@@ -12,7 +12,7 @@ import java.util.concurrent.TimeoutException;
 @ApplicationScoped
 public class MQConnectionFactory {
     @Inject
-    @ConfigProperty(name = "rabbit.hostname", defaultValue = "172.55.0.5")
+    @ConfigProperty(name = "rabbit.hostname", defaultValue = "rabbitmq")
     private String hostname;
 
     @Inject

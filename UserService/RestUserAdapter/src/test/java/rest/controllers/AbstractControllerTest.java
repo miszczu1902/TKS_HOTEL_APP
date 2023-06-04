@@ -20,7 +20,6 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
-import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
@@ -28,6 +27,7 @@ import org.testcontainers.utility.MountableFile;
 import rest.dto.GetUserDto;
 import rest.dto.LoginDto;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.Optional;
 
@@ -43,12 +43,15 @@ public abstract sealed class AbstractControllerTest permits UserControllerTest {
     private static final DockerImageName POSTGRES_IMAGE = DockerImageName.parse("postgres:latest");
     private static final DockerImageName RABBIT_IMAGE = DockerImageName.parse("bitnami/rabbitmq:latest");
 
+    private static final String warFilePath = "../RestUserAdapter/target/RestUserAdapter-1.0-SNAPSHOT.war";
+    private static final String rabbitInitFile = "../RestUserAdapter/src/test/resources/create_users.sh";
+
     /* Network and ports */
     protected static int POSTGRES_PORT;
     protected static int PAYARA_PORT;
-    protected static int RABBIT_PORT;
 
     private static final Logger logger = LoggerFactory.getLogger("testcontainers-config");
+
 
     /* Containers */
     @Container
@@ -60,26 +63,14 @@ public abstract sealed class AbstractControllerTest permits UserControllerTest {
             .withExposedPorts(5432);
 
     @Container
-    private static GenericContainer<?> PAYARA = new GenericContainer<>(PAYARA_IMAGE)
-            .withLogConsumer(new Slf4jLogConsumer(logger))
-            .withExposedPorts(8080)
-//            .withCopyFileToContainer(
-//                    MountableFile.forHostPath(Paths.get("target/RestUserAdapter-1.0-SNAPSHOT.war").toAbsolutePath(), 0777),
-//                    "/opt/payara/deployments/RestUserAdapter-1.0-SNAPSHOT.war")
-            .withCopyFileToContainer(
-                    MountableFile.forHostPath(Paths.get("target/RestUserAdapter-1.0-SNAPSHOT.war").toAbsolutePath(), 0777),
-                    "/opt/payara/deployments/RestUserAdapter-1.0-SNAPSHOT.war")
-            .dependsOn(POSTGRES)
-            .waitingFor(Wait.forHttp("/user/api/users/health-check"));
-
-    @Container
     private static GenericContainer<?> RABBIT = new GenericContainer<>(RABBIT_IMAGE)
             .withLogConsumer(new Slf4jLogConsumer(logger))
-            .withExposedPorts(5672)
-            .withCopyFileToContainer(
-                    MountableFile.forHostPath(Paths.get("test/resources/create_users.sh").toAbsolutePath(), 0777),
-                    "/docker-entrypoint-initdb.d/create_users.sh")
-            .dependsOn(PAYARA);
+            .withExposedPorts(5672, 15672);
+
+    @Container
+    private static GenericContainer<?> PAYARA = new GenericContainer<>(PAYARA_IMAGE)
+            .withLogConsumer(new Slf4jLogConsumer(logger))
+            .withExposedPorts(8080, 4848);
 
     @Setter
     protected static String bearerToken = "";
@@ -94,20 +85,33 @@ public abstract sealed class AbstractControllerTest permits UserControllerTest {
     @BeforeClass
     public static void prepareRestAssured() {
         try (Network network = Network.newNetwork()) {
+            RABBIT.withCopyFileToContainer(
+                            MountableFile.forHostPath(Paths.get(new File(rabbitInitFile).getCanonicalPath()).toAbsolutePath(), 0777),
+                            "/docker-entrypoint-initdb.d/create_users.sh")
+                    .waitingFor(Wait.forLogMessage(".*Starting broker... completed with 3 plugins.*", 1))
+                    .dependsOn(POSTGRES);
+            PAYARA.withCopyFileToContainer(
+                    MountableFile.forHostPath(Paths.get(new File(warFilePath).getCanonicalPath()).toAbsolutePath(), 0777),
+                    "/opt/payara/deployments/RestUserAdapter-1.0-SNAPSHOT.war")
+                    .dependsOn(RABBIT)
+                    .waitingFor(Wait.forHttp("/user/api/users/health-check"));
+
             POSTGRES.withNetwork(network).withNetworkAliases("databaseUser");
             PAYARA.withNetwork(network).withNetworkAliases("appserver");
-            RABBIT.withNetwork(network).withNetworkAliases("rabbit");
+            RABBIT.withNetwork(network).withNetworkAliases("rabbitmq");
 
             POSTGRES.start();
             POSTGRES_PORT = POSTGRES.getMappedPort(5432);
+
+            RABBIT.start();
+
             PAYARA.start();
             PAYARA_PORT = PAYARA.getMappedPort(8080);
-            RABBIT.start();
-            RABBIT_PORT = RABBIT.getMappedPort(5672);
 
             logger.info("Postgres port: " + POSTGRES_PORT);
             logger.info("Payara port: " + PAYARA_PORT);
-            logger.info("Rabbit port: " + PAYARA_PORT);
+            logger.info("Payara admin port: " + PAYARA.getMappedPort(4848));
+            logger.info("Rabbit console port: " + RABBIT.getMappedPort(15672));
 
             RestAssured.baseURI = "http://localhost:" + PAYARA_PORT + "/user/api";
             RestAssured.port = PAYARA_PORT;
